@@ -15,11 +15,13 @@ namespace ConfigDir.Internal
 
         static int counter;
         static readonly string unicName;
+        static readonly Dictionary<Type, Tuple<Type, string[]>> cash;
 
         static TypeBinder()
         {
             counter = 0;
             unicName = string.Join("", Guid.NewGuid().ToByteArray().Select(c => c.ToString("X")));
+            cash = new Dictionary<Type, Tuple<Type, string[]>>();
         }
 
         public static TConfig CreateSubConfig<TConfig>(IFinder finder)
@@ -37,14 +39,24 @@ namespace ConfigDir.Internal
 
         public static TConfig CreateDynamicInstance<TConfig>(IFinder finder) where TConfig : IConfigBase
         {
-            var properties = TypeInspector.GetNotImplementedProperties<TConfig>();
-            var type = GetDynamicType(typeof(TConfig), properties);
+            var type = typeof(TConfig);
 
-            var instance = (TConfig)Activator.CreateInstance(type);
+            if (!cash.ContainsKey(type))
+            {
+                var properties = TypeInspector.GetNotImplementedProperties<TConfig>();
+                cash[type] = new Tuple<Type, string[]>
+                (
+                    GetDynamicType(type, properties),
+                    properties.Select(p => p.Name).ToArray()
+                );
+            }
+
+            var c = cash[type];
+            var instance = (TConfig)Activator.CreateInstance(c.Item1);
 
             var props = new InstancePropertyes
             {
-                KeysSet = properties.Select(p => p.Name).ToHashSet(),
+                KeysSet = c.Item2.ToHashSet(),
                 Finder = finder,
             };
 
