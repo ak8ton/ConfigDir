@@ -11,12 +11,12 @@ namespace ConfigDir
 
         static private readonly Dictionary<string, object> pathDict = new Dictionary<string, object>();
 
-        static public TConfig GetOrCreate<TConfig>(string path) where TConfig : IConfig, new()
+        static public TConfig GetOrCreate<TConfig>(string path) where TConfig : IConfig
         {
             return GetOrCreate<TConfig>(path, null);
         }
 
-        static public TConfig GetOrCreate<TConfig>(string path, Action<TConfig> init) where TConfig : IConfig, new()
+        static public TConfig GetOrCreate<TConfig>(string path, Action<TConfig> init) where TConfig : IConfig
         {
             path = GetAbsolutePath(path);
 
