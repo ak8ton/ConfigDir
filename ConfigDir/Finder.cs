@@ -1,44 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using ConfigDir.Internal;
 
-namespace ConfigDir.Internal
+
+namespace ConfigDir
 {
-    class Finder : IFinder
+    public abstract partial class Config 
     {
-        private readonly List<ISource> deck = new List<ISource>(); 
+        private readonly List<ISource> deck = new List<ISource>();
 
-        public IFinder Parent { get; }
-        public string Key { get; }
-        public string Description { get; set; } = "";
+        public Config Parent { get; private set; }
+        public string Key { get; private set; }
 
-        private Finder(IFinder parent, string key)
+        private void SetParent(Config parent, string key)
         {
-            Parent = parent;
+            Parent = Parent;
             Key = key;
-            if (parent != null)
-            {
-                deck.Add(new ParentSource(parent, key));
-            }
+            deck.Add(new ParentSource(parent, key));
         }
 
-        public Finder() : this(null, "" ) {}
-
-        public IFinder Query(string key)
-        {
-            return new Finder(this, key);
-        }
-
-        public void Update(ISource source)
+        public Config Update(ISource source)
         {
             deck.Insert(0, source);
+            return this;
         }
 
-        public void Extend(ISource source)
+        public Config Extend(ISource source)
         {
             deck.Add(source);
+            return this;
         }
 
-        public IEnumerable<ValueOrSource> GetAllValues(string key)
+        private IEnumerable<ValueOrSource> FindAllValues(string key)
         {
             foreach (var source in deck)
             {

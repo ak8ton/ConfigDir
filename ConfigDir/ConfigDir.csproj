@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <RepositoryUrl>https://github.com/ak8ton/ConfigDir</RepositoryUrl>
-    <Version>1.0.0-alpha</Version>
+    <Version>1.0.1-alpha</Version>
   </PropertyGroup>
 
 </Project>

@@ -15,7 +15,7 @@ namespace ConfigDir.Internal
 
         static TypeInspector()
         {
-            baseMembers = ConfigBase.BaseConfigType.GetMembers(flags);
+            baseMembers = typeof(Config).GetMembers(flags);
             arrayType = typeof(IEnumerable<>);
 
             primitiveTypes = new Type[] {
@@ -52,7 +52,7 @@ namespace ConfigDir.Internal
             return GetTypeCategory(type) != TypeCategory.None;
         }
 
-        static public IEnumerable<PropertyInfo> GetNotImplementedProperties<TConfig>() where TConfig : IConfigBase
+        static public IEnumerable<PropertyInfo> GetNotImplementedProperties<TConfig>()
         {
             var notImplementedMethods = new List<MethodInfo>();
             var notImplementedProperties = new List<PropertyInfo>();
@@ -111,7 +111,7 @@ namespace ConfigDir.Internal
 
         static bool IsConfig(Type type)
         {
-            return typeof(IConfigBase).IsAssignableFrom(type);
+            return typeof(IConfig).IsAssignableFrom(type);
         }
 
         static bool IsArray(Type type)

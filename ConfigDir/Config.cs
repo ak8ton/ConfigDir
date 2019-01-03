@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using ConfigDir.Internal;
 
 
@@ -10,52 +8,13 @@ namespace ConfigDir
     /// <summary>
     /// Базовый класс привязки
     /// </summary>
-    public abstract class ConfigBase : IConfigBase
+    public abstract partial class Config : IConfig
     {
-        #region Reflection
-
-        internal static readonly Type BaseConfigType;
-        internal static readonly Type[] GetterArgs;
-        internal static readonly Type[] SetterArgs;
-        internal static readonly MethodInfo Getter;
-        internal static readonly MethodInfo Setter;
-
-        static ConfigBase()
-        {
-            var getterName = nameof(GetValue);
-            var setterName = nameof(SetValue);
-
-            BaseConfigType = typeof(ConfigBase);
-            Getter = BaseConfigType.GetMethod(getterName);
-            Setter = BaseConfigType.GetMethod(setterName);
-
-            GetterArgs = Getter.GetParameters().Select(p => p.ParameterType).ToArray();
-            SetterArgs = Setter.GetParameters().Select(p => p.ParameterType).ToArray();
-        }
-
-        #endregion Reflection
-
-
-        #region Instance
-
-        private HashSet<string> KeysSet;
-        private IFinder Finder;
-
-        // TODO Converters
-
-        internal static void Init(IConfigBase instance, InstancePropertyes props)
-        {
-            var config = (ConfigBase)instance;
-            config.KeysSet = props.KeysSet;
-            config.Finder = props.Finder;
-        }
-
-        #endregion Instance
-
+        public string Description { get; set; } = "";
 
         private readonly Dictionary<string, object> cash = new Dictionary<string, object>();
 
-        public string[] Keys => KeysSet.ToArray();
+        public string[] Keys { get; private set; }
 
         public virtual void Validate(string key, object value)
         {
@@ -101,18 +60,6 @@ namespace ConfigDir
             cash[key] = value;
         }
 
-        public ConfigBase Extend(ISource source)
-        {
-            Finder.Extend(source);
-            return this;
-        }
-
-        public ConfigBase Update(ISource source)
-        {
-            Finder.Update(source);
-            return this;
-        }
-
         private TValue FindValue<TValue>(string key)
         {
             switch (TypeInspector.GetTypeCategory(typeof(TValue)))
@@ -124,7 +71,7 @@ namespace ConfigDir
                     return FindPrimitiveValue<TValue>(key);
 
                 case TypeCategory.Config:
-                    return TypeBinder.CreateSubConfig<TValue>(Finder.Query(key));
+                    return CreateSubConfig<TValue>(key);
 
                 default:
                     throw new NotImplementedException("GetValue<TValue>(string key)");
@@ -133,7 +80,7 @@ namespace ConfigDir
 
         private TValue FindPrimitiveValue<TValue>(string key)
         {
-            foreach (var value in Finder.GetAllValues(key))
+            foreach (var value in FindAllValues(key))
             {
                 if (value.Type == ValueOrSourceType.value)
                 {
@@ -146,5 +93,6 @@ namespace ConfigDir
 
             throw new Exception();
         }
+
     }
 }

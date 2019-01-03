@@ -4,64 +4,72 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using static System.Reflection.MethodAttributes;
-using static ConfigDir.ConfigBase;
+using ConfigDir.Internal;
 
 
-namespace ConfigDir.Internal
+namespace ConfigDir
 {
-    static class TypeBinder
+    public abstract partial class Config
     {
+        static readonly Type BaseConfigType;
+        static readonly Type[] GetterArgs;
+        static readonly Type[] SetterArgs;
+        static readonly MethodInfo Getter;
+        static readonly MethodInfo Setter;
+
         const MethodAttributes getSetAttr = Public | SpecialName | HideBySig | Virtual | ReuseSlot;
 
         static int counter;
         static readonly string unicName;
-        static readonly Dictionary<Type, Tuple<Type, string[]>> cash;
+        static readonly Dictionary<Type, Tuple<Type, string[]>> TypeDictionary;
 
-        static TypeBinder()
+        static Config()
         {
+            var getterName = nameof(Config.GetValue);
+            var setterName = nameof(Config.SetValue);
+
+            BaseConfigType = typeof(Config);
+            Getter = BaseConfigType.GetMethod(getterName);
+            Setter = BaseConfigType.GetMethod(setterName);
+
+            GetterArgs = Getter.GetParameters().Select(p => p.ParameterType).ToArray();
+            SetterArgs = Setter.GetParameters().Select(p => p.ParameterType).ToArray();
+
             counter = 0;
             unicName = string.Join("", Guid.NewGuid().ToByteArray().Select(c => c.ToString("X")));
-            cash = new Dictionary<Type, Tuple<Type, string[]>>();
+            TypeDictionary = new Dictionary<Type, Tuple<Type, string[]>>();
         }
 
-        public static TConfig CreateSubConfig<TConfig>(IFinder finder)
+        TConfig CreateSubConfig<TConfig>(string key)
         {
             var cfgType = typeof(TConfig);
-            if (!typeof(IConfigBase).IsAssignableFrom(cfgType))
+            if (!typeof(IConfig).IsAssignableFrom(cfgType))
             {
                 throw new Exception(typeof(TConfig).FullName);
             }
 
-            var m = typeof(TypeBinder).GetMethod(nameof(CreateDynamicInstance));
-            var gm = m.MakeGenericMethod(new[] { cfgType });
-            return (TConfig)gm.Invoke(null, new object[] { finder });
+            var config = CreateDynamicInstance<TConfig>();
+            ((Config)config).SetParent(this, key);
+            return (TConfig)config;
         }
 
-        public static TConfig CreateDynamicInstance<TConfig>(IFinder finder) where TConfig : IConfigBase
+        static object CreateDynamicInstance<TConfig>()
         {
             var type = typeof(TConfig);
 
-            if (!cash.ContainsKey(type))
+            if (!TypeDictionary.ContainsKey(type))
             {
                 var properties = TypeInspector.GetNotImplementedProperties<TConfig>();
-                cash[type] = new Tuple<Type, string[]>
-                (
-                    GetDynamicType(type, properties),
-                    properties.Select(p => p.Name).ToArray()
-                );
+                TypeDictionary[type] = new Tuple<Type, string[]>
+                    (
+                        GetDynamicType(type, properties),
+                        properties.Select(p => p.Name).ToArray()
+                    );
             }
 
-            var c = cash[type];
-            var instance = (TConfig)Activator.CreateInstance(c.Item1);
-
-            var props = new InstancePropertyes
-            {
-                KeysSet = c.Item2.ToHashSet(),
-                Finder = finder,
-            };
-
-            Init(instance, props);
-
+            var c = TypeDictionary[type];
+            var instance = Activator.CreateInstance(c.Item1);
+            ((Config)instance).Keys = c.Item2;
             return instance;
         }
 
@@ -80,7 +88,6 @@ namespace ConfigDir.Internal
             }
 
             var tb = GetTypeBuilder(parent, interfaces);
-            // var propAttr = PropertyAttributes.HasDefault;
 
             foreach (var pi in properties)
             {
@@ -145,3 +152,4 @@ namespace ConfigDir.Internal
         }
     }
 }
+
