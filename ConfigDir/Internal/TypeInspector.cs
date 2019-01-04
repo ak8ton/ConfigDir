@@ -9,13 +9,13 @@ namespace ConfigDir.Internal
     static class TypeInspector
     {
         const BindingFlags flags = BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.Instance;
-        static readonly MemberInfo[] baseMembers;
+        static readonly string[] baseAsm;
         static readonly Type arrayType;
         static readonly Type[] primitiveTypes;
 
         static TypeInspector()
         {
-            baseMembers = typeof(Config).GetMembers(flags);
+            baseAsm = typeof(Config).GetMembers(flags).Select(m => m.Module.Assembly.FullName).Distinct().ToArray();
             arrayType = typeof(IEnumerable<>);
 
             primitiveTypes = new Type[] {
@@ -60,7 +60,7 @@ namespace ConfigDir.Internal
             var members = typeof(TConfig).GetMembers(flags);
             foreach (var mi in members)
             {
-                if (baseMembers.Contains(mi))
+                if (IsInherited(mi))
                 {
                     continue;
                 }
@@ -98,6 +98,11 @@ namespace ConfigDir.Internal
            // }
 
             return notImplementedProperties;
+        }
+
+        static bool IsInherited(MemberInfo mi)
+        {
+            return baseAsm.Contains(mi.Module.Assembly.FullName);
         }
 
         static bool IsPrimitive(Type type)

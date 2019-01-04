@@ -1,6 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using ConfigDir.Data;
+using ConfigDir.Readers;
 using ConfigDir.Internal;
+using System;
+using System.Collections.Generic;
 
 
 namespace ConfigDir
@@ -8,30 +10,35 @@ namespace ConfigDir
     /// <summary>
     /// Базовый класс привязки
     /// </summary>
-    public abstract partial class Config : IConfig
+    public abstract class Config : IConfig
     {
-        public string Description { get; set; } = "";
+        public Finder Data { get; private set; }
 
-        private readonly Dictionary<string, object> cash = new Dictionary<string, object>();
-
-        public string[] Keys { get; private set; }
-
-        public virtual void Validate(string key, object value)
+        internal void SetFinder(Finder finder)
         {
+            if (Data != null) throw new Exception("Data != null");
+            finder.OnValidate += Validate;
+            Data = finder;
         }
 
-        public TValue GetValue<TValue>(string key)
-        {
-            if (string.IsNullOrWhiteSpace(key))
-            {
-                throw new ArgumentException(nameof(key));
-            }
+        public static string BasePath { get; set; } = "";
 
-            if (cash.ContainsKey(key))
+        public static TConfig GetOrCreate<TConfig>(string path) where TConfig : IConfig
+        {
+            return GetOrCreate<TConfig>(path, null);
+        }
+
+        public virtual void Validate(string key, object value) { }
+
+        public static TConfig GetOrCreate<TConfig>(string path, Action<TConfig> init) where TConfig : IConfig
+        {
+            path = GetAbsolutePath(path);
+
+            if (cash.ContainsKey(path))
             {
-                if (cash[key] is TValue v)
+                if (cash[path] is TConfig c)
                 {
-                    return v;
+                    return c;
                 }
                 else
                 {
@@ -39,60 +46,20 @@ namespace ConfigDir
                 }
             }
 
-            TValue value = FindValue<TValue>(key);
-            cash[key] = value;
-
-            return value;
+            var config = (TConfig)TypeBinder.CreateDynamicInstance<TConfig>();
+            config.Data.Extend(new DirSource(path));
+            init?.Invoke(config);
+            cash[path] = config;
+            return config;
         }
 
-        public void SetValue(string key, object value)
+        // private
+
+        private static readonly Dictionary<string, object> cash = new Dictionary<string, object>();
+
+        private static string GetAbsolutePath(string path)
         {
-            if (string.IsNullOrWhiteSpace(key))
-            {
-                throw new ArgumentException(nameof(key));
-            }
-
-            if (value is null)
-            {
-                throw new ArgumentException(nameof(value));
-            }
-
-            cash[key] = value;
+            return System.IO.Path.Combine(BasePath ?? "", path ?? "");
         }
-
-        private TValue FindValue<TValue>(string key)
-        {
-            switch (TypeInspector.GetTypeCategory(typeof(TValue)))
-            {
-                case TypeCategory.None:
-                    throw new ArgumentException("GetValue<TValue>(string key)");
-
-                case TypeCategory.Primitive:
-                    return FindPrimitiveValue<TValue>(key);
-
-                case TypeCategory.Config:
-                    return CreateSubConfig<TValue>(key);
-
-                default:
-                    throw new NotImplementedException("GetValue<TValue>(string key)");
-            }
-        }
-
-        private TValue FindPrimitiveValue<TValue>(string key)
-        {
-            foreach (var value in FindAllValues(key))
-            {
-                if (value.Type == ValueOrSourceType.value)
-                {
-                    var v = (TValue)Convert.ChangeType(value.Value, typeof(TValue));
-                    Validate(key, v);
-                    return v;
-                }
-                throw new Exception();
-            }
-
-            throw new Exception();
-        }
-
     }
 }

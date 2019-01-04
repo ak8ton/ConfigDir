@@ -1,17 +1,18 @@
 ﻿using System.Collections.Generic;
 using ConfigDir.Internal;
 
-namespace ConfigDir
+
+namespace ConfigDir.Data
 {
-    public abstract partial class Config
+    public partial class Finder
     {
         private class ParentSource : ISource
         {
-            private readonly Config parentConfig;
+            private readonly Finder parentConfig;
             private readonly string parentKey;
             public string Description => parentConfig.Description;
 
-            public ParentSource(Config parent, string key)
+            public ParentSource(Finder parent, string key)
             {
                 parentConfig = parent;
                 parentKey = key;

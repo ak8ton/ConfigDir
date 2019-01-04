@@ -1,22 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using ConfigDir.Internal;
-
-
-namespace ConfigDir
+﻿namespace ConfigDir.Data
 {
-    public delegate void ConfigEventHandler(ConfigEventArgs args);
-
-    public class ConfigEventArgs
-    {
-
-    }
-
-    public abstract partial class Config
+    public partial class Finder
     {
         public event ConfigEventHandler OnValueFound;
         public event ConfigEventHandler OnValueNotFound;
         public event ConfigEventHandler OnValueTypeError;
+        public event ValidateEventHandler OnValidate;
 
         private void ValueFound()
         {
@@ -34,6 +23,11 @@ namespace ConfigDir
         {
             OnValueTypeError?.Invoke(null);
             Parent?.ValueTypeError();
+        }
+
+        private void Validate(string key, object value)
+        {
+            OnValidate?.Invoke(key, value);
         }
     }
 }

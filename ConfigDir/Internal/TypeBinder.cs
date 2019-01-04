@@ -1,21 +1,22 @@
-﻿using System;
+﻿using ConfigDir.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using static System.Reflection.MethodAttributes;
-using ConfigDir.Internal;
 
 
-namespace ConfigDir
+namespace ConfigDir.Internal
 {
-    public abstract partial class Config
+    static class TypeBinder
     {
         static readonly Type BaseConfigType;
         static readonly Type[] GetterArgs;
         static readonly Type[] SetterArgs;
         static readonly MethodInfo Getter;
         static readonly MethodInfo Setter;
+        static readonly MethodInfo DataGetter;
 
         const MethodAttributes getSetAttr = Public | SpecialName | HideBySig | Virtual | ReuseSlot;
 
@@ -23,14 +24,18 @@ namespace ConfigDir
         static readonly string unicName;
         static readonly Dictionary<Type, Tuple<Type, string[]>> TypeDictionary;
 
-        static Config()
+        static TypeBinder()
         {
-            var getterName = nameof(Config.GetValue);
-            var setterName = nameof(Config.SetValue);
+            var getterName = nameof(Finder.GetValue);
+            var setterName = nameof(Finder.SetValue);
+            var dataGetterName = nameof(Config.Data);
 
             BaseConfigType = typeof(Config);
-            Getter = BaseConfigType.GetMethod(getterName);
-            Setter = BaseConfigType.GetMethod(setterName);
+
+            var data = typeof(Finder);
+            Getter = data.GetMethod(getterName);
+            Setter = data.GetMethod(setterName);
+            DataGetter = BaseConfigType.GetProperty(dataGetterName).GetGetMethod();
 
             GetterArgs = Getter.GetParameters().Select(p => p.ParameterType).ToArray();
             SetterArgs = Setter.GetParameters().Select(p => p.ParameterType).ToArray();
@@ -40,7 +45,7 @@ namespace ConfigDir
             TypeDictionary = new Dictionary<Type, Tuple<Type, string[]>>();
         }
 
-        TConfig CreateSubConfig<TConfig>(string key)
+        public static TConfig CreateSubConfig<TConfig>(Finder parent, string key)
         {
             var cfgType = typeof(TConfig);
             if (!typeof(IConfig).IsAssignableFrom(cfgType))
@@ -49,11 +54,11 @@ namespace ConfigDir
             }
 
             var config = CreateDynamicInstance<TConfig>();
-            ((Config)config).SetParent(this, key);
+            ((Config)config).Data.SetParent(parent, key);
             return (TConfig)config;
         }
 
-        static object CreateDynamicInstance<TConfig>()
+        public static object CreateDynamicInstance<TConfig>()
         {
             var type = typeof(TConfig);
 
@@ -61,15 +66,16 @@ namespace ConfigDir
             {
                 var properties = TypeInspector.GetNotImplementedProperties<TConfig>();
                 TypeDictionary[type] = new Tuple<Type, string[]>
-                    (
-                        GetDynamicType(type, properties),
-                        properties.Select(p => p.Name).ToArray()
-                    );
+                (
+                    GetDynamicType(type, properties),
+                    properties.Select(p => p.Name).ToArray()
+                );
             }
 
             var c = TypeDictionary[type];
             var instance = Activator.CreateInstance(c.Item1);
-            ((Config)instance).Keys = c.Item2;
+            var data = new Finder(c.Item2);
+            ((Config)instance).SetFinder(data);
             return instance;
         }
 
@@ -124,6 +130,7 @@ namespace ConfigDir
 
             var il = getAccessor.GetILGenerator();
             il.Emit(OpCodes.Ldarg_0);
+            il.EmitCall(OpCodes.Call, DataGetter, Type.EmptyTypes);
             il.Emit(OpCodes.Ldstr, pi.Name);
             il.EmitCall(OpCodes.Call, Getter.MakeGenericMethod(pi.PropertyType), GetterArgs);
             il.Emit(OpCodes.Ret);
@@ -143,6 +150,7 @@ namespace ConfigDir
 
             var il = setter.GetILGenerator();
             il.Emit(OpCodes.Ldarg_0);
+            il.EmitCall(OpCodes.Call, DataGetter, Type.EmptyTypes);
             il.Emit(OpCodes.Ldstr, pi.Name);
             il.Emit(OpCodes.Ldarg_1);
             il.EmitCall(OpCodes.Call, Setter, SetterArgs);

@@ -1,15 +1,16 @@
 ﻿using System.Collections.Generic;
+using ConfigDir.Data;
 
 namespace ConfigDir
 {
     public static class Extensions
     {
-        public static string GetPath(this Config config)
+        public static string GetPath(this Finder config)
         {
             return string.Join("/", GetPathItems(config));
         }
 
-        static string[] GetPathItems(this Config config)
+        static string[] GetPathItems(this Finder config)
         {
             var path = new List<string>();
 
