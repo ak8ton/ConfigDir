@@ -16,5 +16,9 @@
         void Validate(string key, object value);
         TValue GetValue<TValue>(string key);
         void SetValue(string key, object value);
+
+        event ConfigEventHandler OnValueFound;
+        event ConfigEventHandler OnValueNotFound;
+        event ConfigEventHandler OnValueTypeError;
     }
 }
