@@ -9,7 +9,7 @@ namespace ConfigDir
             return string.Join("/", GetPathItems(config));
         }
 
-        public static string[] GetPathItems(this Config config)
+        static string[] GetPathItems(this Config config)
         {
             var path = new List<string>();
 
