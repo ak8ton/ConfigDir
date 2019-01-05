@@ -86,10 +86,10 @@ namespace ConfigDir.Internal
                 if (pi.CanWrite) settersAndGetters++;
             }
 
-            // if (notImplementedMethods.Count != settersAndGetters)
-            // {
-            //     throw new ArgumentException("Тип имеет нереализованные методы");
-            // }
+            if (notImplementedMethods.Count != settersAndGetters)
+            {
+                throw new Exception("Тип имеет нереализованные методы");
+            }
 
             return notImplementedProperties;
         }

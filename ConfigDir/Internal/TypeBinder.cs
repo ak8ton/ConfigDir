@@ -87,6 +87,11 @@ namespace ConfigDir.Internal
                 parent = baseType;
             }
 
+            if (!BaseConfigType.IsAssignableFrom(parent))
+            {
+                throw new Exception("Класс конфига должен быть унаследован от " + BaseConfigType.FullName);
+            }
+
             var tb = GetTypeBuilder(parent, interfaces);
 
             foreach (var pi in properties)
