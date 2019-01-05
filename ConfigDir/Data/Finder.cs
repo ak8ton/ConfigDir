@@ -76,10 +76,7 @@ namespace ConfigDir.Data
         {
             switch (TypeInspector.GetTypeCategory(typeof(TValue)))
             {
-                case TypeCategory.None:
-                    throw new ArgumentException("GetValue<TValue>(string key)");
-
-                case TypeCategory.Primitive:
+                case TypeCategory.Value:
                     return FindPrimitiveValue<TValue>(key);
 
                 case TypeCategory.Config:

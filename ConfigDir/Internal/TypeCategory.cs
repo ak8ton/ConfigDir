@@ -2,8 +2,7 @@
 {
     enum TypeCategory
     {
-        None,
-        Primitive,
+        Value,
         Array,
         Config
     }
