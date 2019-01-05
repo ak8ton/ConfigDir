@@ -47,12 +47,6 @@ namespace ConfigDir.Internal
 
         public static TConfig CreateSubConfig<TConfig>(Finder parent, string key)
         {
-            var cfgType = typeof(TConfig);
-          //  if (!typeof(Config).IsAssignableFrom(cfgType))
-          //  {
-          //      throw new Exception(typeof(TConfig).FullName);
-          //  }
-
             var config = CreateDynamicInstance<TConfig>();
             ((Config)config).Data.SetParent(parent, key);
             return (TConfig)config;
