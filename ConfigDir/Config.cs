@@ -10,7 +10,7 @@ namespace ConfigDir
     /// <summary>
     /// Базовый класс привязки
     /// </summary>
-    public abstract class Config : IConfig
+    public abstract class Config
     {
         public Finder Data { get; private set; }
 
@@ -23,14 +23,14 @@ namespace ConfigDir
 
         public static string BasePath { get; set; } = "";
 
-        public static TConfig GetOrCreate<TConfig>(string path) where TConfig : IConfig
+        public static TConfig GetOrCreate<TConfig>(string path) where TConfig : class
         {
             return GetOrCreate<TConfig>(path, null);
         }
 
         public virtual void Validate(string key, object value) { }
 
-        public static TConfig GetOrCreate<TConfig>(string path, Action<TConfig> init) where TConfig : IConfig
+        public static TConfig GetOrCreate<TConfig>(string path, Action<TConfig> init) where TConfig : class
         {
             path = GetAbsolutePath(path);
 
@@ -46,8 +46,11 @@ namespace ConfigDir
                 }
             }
 
+            // todo
+            // TypeInspector.CheckTypeIsConfig(typeof(TConfig));
+
             var config = (TConfig)TypeBinder.CreateDynamicInstance<TConfig>();
-            config.Data.Extend(new DirSource(path));
+            (config as Config).Data.Extend(new DirSource(path));
             init?.Invoke(config);
             cash[path] = config;
             return config;

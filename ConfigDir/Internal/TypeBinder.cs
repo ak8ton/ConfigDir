@@ -48,10 +48,10 @@ namespace ConfigDir.Internal
         public static TConfig CreateSubConfig<TConfig>(Finder parent, string key)
         {
             var cfgType = typeof(TConfig);
-            if (!typeof(IConfig).IsAssignableFrom(cfgType))
-            {
-                throw new Exception(typeof(TConfig).FullName);
-            }
+          //  if (!typeof(Config).IsAssignableFrom(cfgType))
+          //  {
+          //      throw new Exception(typeof(TConfig).FullName);
+          //  }
 
             var config = CreateDynamicInstance<TConfig>();
             ((Config)config).Data.SetParent(parent, key);
@@ -74,8 +74,8 @@ namespace ConfigDir.Internal
 
             var c = TypeDictionary[type];
             var instance = Activator.CreateInstance(c.Item1);
-            var data = new Finder(c.Item2);
-            ((Config)instance).SetFinder(data);
+            var finder = new Finder(c.Item2);
+            ((Config)instance).SetFinder(finder);
             return instance;
         }
 

@@ -116,7 +116,7 @@ namespace ConfigDir.Internal
 
         static bool IsConfig(Type type)
         {
-            return typeof(IConfig).IsAssignableFrom(type);
+            return type.IsInterface || typeof(Config).IsAssignableFrom(type);
         }
 
         static bool IsArray(Type type)

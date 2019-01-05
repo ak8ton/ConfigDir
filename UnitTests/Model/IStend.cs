@@ -3,7 +3,7 @@
 
 namespace UnitTests.Model
 {
-    public interface IStend : IConfig
+    public interface IStend
     {
         string Name { get; }
     }
