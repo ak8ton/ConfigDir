@@ -7,22 +7,24 @@
         public event ConfigEventHandler OnValueTypeError;
         public event ValidateEventHandler OnValidate;
 
-        private void ValueFound()
+        private void ValueFound(ConfigEventArgs args)
         {
-            OnValueFound?.Invoke(null);
-            Parent?.ValueFound();
+            OnValueFound?.Invoke(args);
+            Parent?.ValueFound(args);
         }
 
-        private void ValueNotFound()
+        private void ValueNotFound(ConfigEventArgs args)
         {
-            OnValueNotFound?.Invoke(null);
-            Parent?.ValueNotFound();
+            OnValueNotFound?.Invoke(args);
+            Parent?.ValueNotFound(args);
+            throw new System.Exception("Значение не найдено\n" + args);
         }
 
-        private void ValueTypeError()
+        private void ValueTypeError(ConfigEventArgs args)
         {
-            OnValueTypeError?.Invoke(null);
-            Parent?.ValueTypeError();
+            OnValueTypeError?.Invoke(args);
+            Parent?.ValueTypeError(args);
+            throw new System.Exception("Не удалось привести значение к типу\n" + args);
         }
 
         private void Validate(string key, object value)

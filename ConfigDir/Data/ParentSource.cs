@@ -29,7 +29,7 @@ namespace ConfigDir.Data
                             break;
 
                         case ValueOrSourceType.value:
-                            yield return ValueOrSource.MkStop(value.Source, value.Value);
+                            yield return ValueOrSource.MkStop(value);
                             break;
 
                         case ValueOrSourceType.source:
@@ -41,11 +41,11 @@ namespace ConfigDir.Data
                                 }
                                 else if (obj is ISource src)
                                 {
-                                    yield return ValueOrSource.MkSource(src);
+                                    yield return ValueOrSource.MkSource(parentConfig, src, parentKey, key);
                                 }
                                 else
                                 {
-                                    yield return ValueOrSource.MkValue(value.Source, obj);
+                                    yield return ValueOrSource.MkValue(parentConfig, value.Source, obj, parentKey, key);
                                 }
                             }
                             break;

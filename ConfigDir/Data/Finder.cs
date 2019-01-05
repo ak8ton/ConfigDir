@@ -78,7 +78,6 @@ namespace ConfigDir.Data
             {
                 case TypeCategory.Value:
                     return FindPrimitiveValue<TValue>(key);
-
                 case TypeCategory.Config:
                     return TypeBinder.CreateSubConfig<TValue>(this, key);
 
@@ -95,11 +94,15 @@ namespace ConfigDir.Data
                 {
                     var v = (TValue)Convert.ChangeType(value.Value, typeof(TValue));
                     Validate(key, v);
+                    ValueFound(value.ToEventArgs(typeof(TValue), v));
                     return v;
                 }
-                throw new Exception();
+
+                ValueTypeError(value.ToEventArgs(typeof(TValue)));
+                break;
             }
 
+            ValueNotFound(new ConfigEventArgs { Path = this.GetPath(key) });
             throw new Exception();
         }
 
@@ -132,11 +135,11 @@ namespace ConfigDir.Data
                     }
                     else if (value is ISource src)
                     {
-                        yield return ValueOrSource.MkSource(src);
+                        yield return ValueOrSource.MkSource(this, src, key);
                     }
                     else
                     {
-                        yield return ValueOrSource.MkValue(source, value);
+                        yield return ValueOrSource.MkValue(this, source, value, key);
                     }
                 }
             }
