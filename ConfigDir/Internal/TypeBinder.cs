@@ -47,12 +47,12 @@ namespace ConfigDir.Internal
 
         public static TConfig CreateSubConfig<TConfig>(Finder parent, string key)
         {
-            var config = CreateDynamicInstance<TConfig>();
-            ((Config)config).Data.SetParent(parent, key);
+            var config = CreateDynamicInstance<TConfig>(key);
+            ((Config)config).Data.SetParent(parent);
             return (TConfig)config;
         }
 
-        public static object CreateDynamicInstance<TConfig>()
+        public static object CreateDynamicInstance<TConfig>(string key)
         {
             var type = typeof(TConfig);
 
@@ -68,7 +68,7 @@ namespace ConfigDir.Internal
 
             var c = TypeDictionary[type];
             var instance = Activator.CreateInstance(c.Item1);
-            var finder = new Finder(c.Item2);
+            var finder = new Finder(key, c.Item2);
             ((Config)instance).SetFinder(finder);
             return instance;
         }

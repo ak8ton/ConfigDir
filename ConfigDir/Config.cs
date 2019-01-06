@@ -46,10 +46,7 @@ namespace ConfigDir
                 }
             }
 
-            // todo
-            // TypeInspector.CheckTypeIsConfig(typeof(TConfig));
-
-            var config = (TConfig)TypeBinder.CreateDynamicInstance<TConfig>();
+            var config = (TConfig)TypeBinder.CreateDynamicInstance<TConfig>(path);
             (config as Config).Data.Extend(new DirSource(BasePath, path));
             init?.Invoke(config);
             cash[path] = config;

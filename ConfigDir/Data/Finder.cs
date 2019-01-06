@@ -9,16 +9,16 @@ namespace ConfigDir.Data
     {
         #region Instance
 
-        internal Finder(string[] keys)
+        internal Finder(string key, string[] keys)
         {
+            Key = key;
             Keys = keys;
         }
 
-        internal void SetParent(Finder parent, string key)
+        internal void SetParent(Finder parent)
         {
             Parent = parent;
-            Key = key;
-            deck.Add(new ParentSource(parent, key));
+            deck.Add(new ParentSource(parent, Key));
         }
 
         #endregion Instance
