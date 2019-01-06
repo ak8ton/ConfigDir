@@ -30,6 +30,7 @@ namespace ConfigDir.Readers
 
         public IEnumerable<object> GetAllValues(string key)
         {
+            key = key.ToLower();
             if (Dict.ContainsKey(key))
             {
                yield return Dict[key];
@@ -49,7 +50,7 @@ namespace ConfigDir.Readers
             //TODO Обработка ошибок IO
             foreach (var el in (element ?? XDocument.Load( System.IO.Path.Combine(BasePath, FilePath)).Root).Elements())
             {
-                string key = el.Name.LocalName;
+                string key = el.Name.LocalName.ToLower();
                 object value = GetValue(el);
                 nodes.Add(el);
 
