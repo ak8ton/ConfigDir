@@ -10,17 +10,21 @@ namespace ConfigDir.Readers
         private Dictionary<string, object> _d = null;
         private Dictionary<string, object> Dict => _d ?? (_d = Parse());
 
-        public string Description => "XML файл " + FileName;
-        public string FileName { get; private set; }
+        public string BasePath { get; }
+        public string FilePath { get; }
+        public string Description { get; }
 
-        public XSource(string fileName)
+        public XSource(string basePath, string fileName)
         {
-            FileName = fileName;
+            BasePath = basePath;
+            FilePath = fileName;
+            Description = "XML файл: " + FilePath;
         }
 
-        private XSource(string fileName, XElement element)
+        private XSource(string basePath, string fileName, XElement element)
         {
-            FileName = fileName;
+            BasePath = basePath;
+            FilePath = fileName;
             this.element = element;
         }
 
@@ -32,13 +36,18 @@ namespace ConfigDir.Readers
             }
         }
 
+        public override string ToString()
+        {
+            return Description;
+        }
+
         private Dictionary<string, object> Parse()
         {
             var dict = new Dictionary<string, object>();
             var nodes = new List<XElement>(); 
 
             //TODO Обработка ошибок IO
-            foreach (var el in (element ?? XDocument.Load(FileName).Root).Elements())
+            foreach (var el in (element ?? XDocument.Load( System.IO.Path.Combine(BasePath, FilePath)).Root).Elements())
             {
                 string key = el.Name.LocalName;
                 object value = GetValue(el);
@@ -72,7 +81,7 @@ namespace ConfigDir.Readers
             // TODO Что делать с аттрибутами?
             if (element.HasElements || element.HasAttributes)
             {
-                return new XSource(FileName, element);
+                return new XSource(BasePath, FilePath, element);
             }
             else
             {

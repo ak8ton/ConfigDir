@@ -50,7 +50,7 @@ namespace ConfigDir
             // TypeInspector.CheckTypeIsConfig(typeof(TConfig));
 
             var config = (TConfig)TypeBinder.CreateDynamicInstance<TConfig>();
-            (config as Config).Data.Extend(new DirSource(path));
+            (config as Config).Data.Extend(new DirSource(BasePath, path));
             init?.Invoke(config);
             cash[path] = config;
             return config;

@@ -9,6 +9,8 @@ namespace ConfigDir.Readers
     class DirSource : ISource
     {
         public string Description { get; }
+        public string BasePath { get; }
+        public string DirName { get; }
 
         private Dictionary<string, List<ISource>> s = null;
         private Dictionary<string, List<ISource>> SourcesByKey => s ?? (s = ReadDir());
@@ -16,10 +18,13 @@ namespace ConfigDir.Readers
 
         private string dirPath;
 
-        public DirSource(string path)
+        public DirSource(string basePath, string dirName)
         {
-            dirPath = Path.GetFullPath(path);
-            Description = "Папка: " + dirPath;
+            basePath = Path.GetFullPath(basePath);
+            BasePath = basePath;
+            DirName = dirName;
+            dirPath = Path.GetFullPath(Path.Combine(basePath, dirName));
+            Description = "Папка: " + dirName;
         }
 
         public IEnumerable<object> GetAllValues(string key)
@@ -31,6 +36,11 @@ namespace ConfigDir.Readers
                     yield return value;
                 }
             }
+        }
+
+        public override string ToString()
+        {
+            return Description;
         }
 
         private Dictionary<string, List<ISource>> ReadDir()
@@ -74,16 +84,16 @@ namespace ConfigDir.Readers
             throw new Exception("Bad filename " + name);
         }
 
-        private ISource GetSource( string path )
+        private ISource GetSource(string path)
         {
             if (Directory.Exists(path))
             {
-                return new DirSource(path);
+                return new DirSource(BasePath, Path.GetRelativePath(BasePath, path));
             }
 
             if (File.Exists(path))
             {
-                return new XSource(path);
+                return new XSource(BasePath, Path.GetRelativePath(BasePath, path));
             }
 
             throw new Exception("Path not exists: " + path);
