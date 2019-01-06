@@ -80,5 +80,10 @@ namespace ConfigDir.Internal
         {
             return new ValueOrSource(value.finder, ValueOrSourceType.stop, value.Source, value.Value, value.keys);
         }
+
+        static public ValueOrSource MkStop(Finder finder, params string[] keys)
+        {
+            return new ValueOrSource(finder, ValueOrSourceType.stop, null, null, keys);
+        }
     }
 }

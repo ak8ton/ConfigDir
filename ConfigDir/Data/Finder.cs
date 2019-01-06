@@ -16,7 +16,7 @@ namespace ConfigDir.Data
 
         internal void SetParent(Finder parent, string key)
         {
-            Parent = Parent;
+            Parent = parent;
             Key = key;
             deck.Add(new ParentSource(parent, key));
         }
@@ -143,6 +143,7 @@ namespace ConfigDir.Data
                     }
                 }
             }
+            yield return ValueOrSource.MkStop(this, key);
         }
     }
 }

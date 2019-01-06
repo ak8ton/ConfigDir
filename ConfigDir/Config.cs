@@ -21,7 +21,7 @@ namespace ConfigDir
             Data = finder;
         }
 
-        public static string BasePath { get; set; } = "";
+        public static string BasePath { get; set; } = System.IO.Directory.GetCurrentDirectory();
 
         public static TConfig GetOrCreate<TConfig>(string path) where TConfig : class
         {

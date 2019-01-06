@@ -6,27 +6,13 @@ using System.Text.RegularExpressions;
 
 namespace ConfigDir.Readers
 {
-    struct KeyPrior
-    {
-        public string Path { get; }
-        public int Prior { get; }
-        public string Key { get; }
-
-        public KeyPrior(string path, int prior, string key)
-        {
-            Path = path;
-            Prior = prior;
-            Key = key;
-        }
-    }
-
     class DirSource : ISource
     {
         public string Description { get; }
 
         private Dictionary<string, List<ISource>> s = null;
         private Dictionary<string, List<ISource>> SourcesByKey => s ?? (s = ReadDir());
-        private readonly Regex pattern = new Regex(@"^(.*_)?(?<KEY>@?_?\p{L}\w{0,20})(?<PRIOR>_\d{1,4})?$", RegexOptions.IgnoreCase);
+        private readonly Regex pattern = new Regex(@"^(.*-)?(?<KEY>@?_?\p{L}\w{0,20})(?<PRIOR>-\d{1,4})?$", RegexOptions.IgnoreCase);
 
         private string dirPath;
 
