@@ -18,7 +18,7 @@ namespace ConfigDir.Data
         internal void SetParent(Finder parent)
         {
             Parent = parent;
-            deck.Add(new ParentSource(parent, Key));
+            deck.Add(new ParentSource(this, parent, Key));
         }
 
         #endregion Instance
@@ -143,7 +143,7 @@ namespace ConfigDir.Data
                     }
                 }
             }
-            yield return ValueOrSource.MkStop(this, key);
+            yield return ValueOrSource.MkStop_NotFound(this, key);
         }
     }
 }

@@ -24,8 +24,8 @@ namespace ConfigDir.Internal
         public object Value { get; }
 
         private readonly Finder finder;
-        private readonly string[] keys;
-        public string Path => finder.GetPath(keys);
+        private readonly string key;
+        public string Path => finder.GetPath(key);
 
         public ConfigEventArgs ToEventArgs(Type expectedType, object value = null)
         {
@@ -39,51 +39,34 @@ namespace ConfigDir.Internal
             };
         }
 
-        private ValueOrSource(Finder finder, ValueOrSourceType type, ISource source, object value, params string[] keys)
+        private ValueOrSource(Finder finder, ValueOrSourceType type, ISource source, object value, string key)
         {
             this.finder = finder;
-            this.keys = keys;
+            this.key = key;
 
             Type = type;
             Source = source;
             Value = value;
         }
 
-        /// <summary>
-        /// Конструктор конечного значения
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        static public ValueOrSource MkValue(Finder finder, ISource source, object value, params string[] keys)
+        static public ValueOrSource MkValue(Finder finder, ISource source, object value, string key)
         {
-            return new ValueOrSource(finder, ValueOrSourceType.value, source, value, keys);
+            return new ValueOrSource(finder, ValueOrSourceType.value, source, value, key);
         }
 
-        /// <summary>
-        /// Конструктор источника
-        /// </summary>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        static public ValueOrSource MkSource(Finder finder, ISource source, params string[] keys)
+        static public ValueOrSource MkSource(Finder finder, ISource source, string key)
         {
-            return new ValueOrSource(finder, ValueOrSourceType.source, source, null, keys);
+            return new ValueOrSource(finder, ValueOrSourceType.source, source, null, key);
         }
 
-        /// <summary>
-        /// Остановить поиск
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        static public ValueOrSource MkStop(ValueOrSource value)
+        static public ValueOrSource MkStop_NotFound(Finder finder, string key)
         {
-            return new ValueOrSource(value.finder, ValueOrSourceType.stop, value.Source, value.Value, value.keys);
+            return new ValueOrSource(finder, ValueOrSourceType.stop, null, null, key);
         }
 
-        static public ValueOrSource MkStop(Finder finder, params string[] keys)
+        static public ValueOrSource MkStop_TypeError(ValueOrSource value)
         {
-            return new ValueOrSource(finder, ValueOrSourceType.stop, null, null, keys);
+            return new ValueOrSource(value.finder, ValueOrSourceType.stop, value.Source, value.Value, value.key);
         }
     }
 }

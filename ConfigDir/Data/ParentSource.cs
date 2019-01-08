@@ -8,12 +8,14 @@ namespace ConfigDir.Data
     {
         private class ParentSource : ISource
         {
+            private readonly Finder thisConfig;
             private readonly Finder parentConfig;
             private readonly string parentKey;
             public string Description => parentConfig.Description;
 
-            public ParentSource(Finder parent, string key)
+            public ParentSource(Finder config, Finder parent, string key)
             {
+                thisConfig = config;
                 parentConfig = parent;
                 parentKey = key;
             }
@@ -29,7 +31,7 @@ namespace ConfigDir.Data
                             break;
 
                         case ValueOrSourceType.value:
-                            yield return ValueOrSource.MkStop(value);
+                            yield return ValueOrSource.MkStop_TypeError(value);
                             break;
 
                         case ValueOrSourceType.source:
@@ -41,11 +43,11 @@ namespace ConfigDir.Data
                                 }
                                 else if (obj is ISource src)
                                 {
-                                    yield return ValueOrSource.MkSource(parentConfig, src, parentKey, key);
+                                    yield return ValueOrSource.MkSource(thisConfig, src, key);
                                 }
                                 else
                                 {
-                                    yield return ValueOrSource.MkValue(parentConfig, value.Source, obj, parentKey, key);
+                                    yield return ValueOrSource.MkValue(thisConfig, value.Source, obj, key);
                                 }
                             }
                             break;
