@@ -27,18 +27,18 @@ namespace ConfigDir.Internal
         private readonly string key;
         public string Path => finder.GetPath(key);
 
-        public ConfigEventArgs ToEventArgs(Type expectedType, object value = null)
+        public ConfigEventArgs ToEventArgs(object value = null)
         {
             var args = GetConfigEventArgs();
             args.Value = value;
-            args.ExpectedType = expectedType;
+            args.ExpectedType = finder.GetValueType(key);
             return args;
         }
 
         public ConfigEventArgs ToEventArgs(string requiredPath)
         {
             var args = GetConfigEventArgs();
-            args.RequiredPath = requiredPath;
+            args.Path = requiredPath;
             return args;
         }
 

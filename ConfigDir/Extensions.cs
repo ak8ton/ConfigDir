@@ -6,12 +6,12 @@ namespace ConfigDir
 {
     public static class Extensions
     {
-        public static string GetPath(this Finder config, params string[] lastKays)
+        public static string GetPath(this Finder config, string lastKay)
         {
-            return string.Join("/", GetPathItems(config).Concat(lastKays));
+            return string.Join("/", GetPathItems(config, lastKay));
         }
 
-        static string[] GetPathItems(Finder config)
+        static string[] GetPathItems(Finder config, string lastKay)
         {
             var path = new List<string>();
 
@@ -26,6 +26,10 @@ namespace ConfigDir
             } while (config != null);
 
             path.Reverse();
+            if (!string.IsNullOrWhiteSpace(lastKay))
+            {
+                path.Add(lastKay);
+            }
             return path.ToArray();
         }
     }

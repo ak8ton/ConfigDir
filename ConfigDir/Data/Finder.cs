@@ -9,8 +9,11 @@ namespace ConfigDir.Data
     {
         #region Instance
 
-        internal Finder(string key, string[] keys)
+        Type ConfigType { get; }
+
+        internal Finder(Type configType, string key, string[] keys)
         {
+            ConfigType = configType;
             Key = key;
             Keys = keys;
         }
@@ -30,7 +33,10 @@ namespace ConfigDir.Data
 
         public string[] Keys { get; }
 
-
+        internal Type GetValueType(string key)
+        {
+            return ConfigType?.GetProperty(key)?.PropertyType;
+        }
 
         public TValue GetValue<TValue>(string key)
         {
@@ -92,9 +98,9 @@ namespace ConfigDir.Data
             {
                 if (value.Type == ValueOrSourceType.value)
                 {
-                    var v = (TValue)Convert.ChangeType(value.Value, typeof(TValue));
+                    var v = ChangeType<TValue>(value);
                     Validate(key, v);
-                    ValueFound(value.ToEventArgs(typeof(TValue), v));
+                    ValueFound(value.ToEventArgs(v));
                     return v;
                 }
 
@@ -103,12 +109,25 @@ namespace ConfigDir.Data
                     ValueNotFound(value.ToEventArgs(this.GetPath(key)));
                 }
 
-                ValueTypeError(value.ToEventArgs(typeof(TValue)));
+                ValueTypeError(value.ToEventArgs());
                 break;
             }
 
             ValueNotFound(new ConfigEventArgs { Path = this.GetPath(key) });
             throw new Exception();
+        }
+
+        private TValue ChangeType<TValue>(ValueOrSource value)
+        {
+            try
+            {
+                return (TValue)Convert.ChangeType(value.Value, typeof(TValue));
+            }
+            catch
+            {
+                ValueTypeError(value.ToEventArgs());
+                throw;
+            }
         }
 
         private readonly List<ISource> deck = new List<ISource>();
