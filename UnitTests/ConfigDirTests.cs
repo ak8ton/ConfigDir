@@ -4,7 +4,7 @@ using ConfigDir;
 namespace UnitTests
 {
     [TestClass]
-    public class ConfigDirTests
+    public class ConfigDirTests : TestBase
     {
         [TestMethod]
         public void TestMethod1()

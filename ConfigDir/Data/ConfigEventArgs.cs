@@ -7,6 +7,11 @@ namespace ConfigDir.Data
         /// <summary>
         /// Путь
         /// </summary>
+        public string RequiredPath { get; internal set; } = null;
+
+        /// <summary>
+        /// Путь
+        /// </summary>
         public string Path { get; internal set; } = "";
 
         /// <summary>
@@ -32,6 +37,11 @@ namespace ConfigDir.Data
         public override string ToString()
         {
             var lines = new List<string>();
+
+            if (!string.IsNullOrWhiteSpace(RequiredPath))
+            {
+                lines.Add("RequiredPath: " + RequiredPath);
+            }
 
             if (Source != null)
             {

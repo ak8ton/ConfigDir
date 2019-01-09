@@ -4,7 +4,7 @@ using ConfigDir;
 namespace UnitTests
 {
     [TestClass]
-    public class Filename
+    public class Filename : TestBase
     {
         [TestMethod]
         public void Prior()

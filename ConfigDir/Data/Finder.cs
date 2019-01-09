@@ -98,6 +98,11 @@ namespace ConfigDir.Data
                     return v;
                 }
 
+                if (value.Value == null)
+                {
+                    ValueNotFound(value.ToEventArgs(this.GetPath(key)));
+                }
+
                 ValueTypeError(value.ToEventArgs(typeof(TValue)));
                 break;
             }

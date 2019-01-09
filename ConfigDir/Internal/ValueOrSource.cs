@@ -29,13 +29,26 @@ namespace ConfigDir.Internal
 
         public ConfigEventArgs ToEventArgs(Type expectedType, object value = null)
         {
+            var args = GetConfigEventArgs();
+            args.Value = value;
+            args.ExpectedType = expectedType;
+            return args;
+        }
+
+        public ConfigEventArgs ToEventArgs(string requiredPath)
+        {
+            var args = GetConfigEventArgs();
+            args.RequiredPath = requiredPath;
+            return args;
+        }
+
+        private ConfigEventArgs GetConfigEventArgs()
+        {
             return new ConfigEventArgs
             {
                 Path = Path,
                 Source = Source,
-                Value = value,
                 RawValue = Value,
-                ExpectedType = expectedType
             };
         }
 
