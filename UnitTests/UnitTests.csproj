@@ -22,10 +22,4 @@
     </Content>
   </ItemGroup>
 
-  <ItemGroup>
-    <None Remove="Config\Filename\MidPriority-Options-6.xml" />
-    <None Remove="Config\Stend.xml" />
-    <None Remove="Config\TypeError.xml" />
-  </ItemGroup>
-  
 </Project>
