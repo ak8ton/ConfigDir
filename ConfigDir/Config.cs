@@ -46,7 +46,7 @@ namespace ConfigDir
                 }
             }
 
-            var key = System.IO.Path.GetRelativePath(BasePath, path);
+            var key = Utils.GetRelativePath(BasePath, path);
             var config = (TConfig)TypeBinder.CreateDynamicInstance<TConfig>(key);
             (config as Config).Data.Extend(new DirSource(BasePath, key));
             init?.Invoke(config);

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFrameworks>net471;netcoreapp2.1</TargetFrameworks>
     <RepositoryUrl>https://github.com/ak8ton/ConfigDir</RepositoryUrl>
     <Version>1.0.1-alpha</Version>
     <AssemblyName>ConfigDir</AssemblyName>

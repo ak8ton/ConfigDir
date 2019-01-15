@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ConfigDir.Internal;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -88,12 +89,12 @@ namespace ConfigDir.Readers
         {
             if (Directory.Exists(path))
             {
-                return new DirSource(BasePath, Path.GetRelativePath(BasePath, path));
+                return new DirSource(BasePath, Utils.GetRelativePath(BasePath, path));
             }
 
             if (File.Exists(path))
             {
-                return new XSource(BasePath, Path.GetRelativePath(BasePath, path));
+                return new XSource(BasePath, Utils.GetRelativePath(BasePath, path));
             }
 
             throw new Exception("Path not exists: " + path);
