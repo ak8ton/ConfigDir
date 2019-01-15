@@ -4,6 +4,10 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
 
     <IsPackable>false</IsPackable>
+
+    <AssemblyName>UnitTests</AssemblyName>
+
+    <RootNamespace>UnitTests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,13 +17,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ConfigDir\ConfigDir.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="Config\**">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ConfigDir\ConfigDir.Core.csproj" />
   </ItemGroup>
 
 </Project>
