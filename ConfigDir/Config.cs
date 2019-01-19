@@ -34,9 +34,9 @@ namespace ConfigDir
         {
             path = GetAbsolutePath(path);
 
-            if (cash.ContainsKey(path))
+            if (cache.ContainsKey(path))
             {
-                if (cash[path] is TConfig c)
+                if (cache[path] is TConfig c)
                 {
                     return c;
                 }
@@ -50,18 +50,18 @@ namespace ConfigDir
             var config = (TConfig)TypeBinder.CreateDynamicInstance(key, typeof(TConfig));
             (config as Config).Data.Extend(new DirSource(BasePath, key));
             init?.Invoke(config);
-            cash[path] = config;
+            cache[path] = config;
             return config;
         }
 
         public static void ResetAll()
         {
-            cash.Clear();
+            cache.Clear();
         }
 
         // private
 
-        private static readonly Dictionary<string, object> cash = new Dictionary<string, object>();
+        private static readonly Dictionary<string, object> cache = new Dictionary<string, object>();
 
         private static string GetAbsolutePath(string path)
         {

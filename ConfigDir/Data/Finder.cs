@@ -29,7 +29,7 @@ namespace ConfigDir.Data
 
         public string Description { get; set; } = "";
 
-        private readonly Dictionary<string, object> cash = new Dictionary<string, object>();
+        private readonly Dictionary<string, object> cache = new Dictionary<string, object>();
 
         public string[] Keys { get; }
 
@@ -45,9 +45,9 @@ namespace ConfigDir.Data
                 throw new ArgumentException(nameof(key));
             }
 
-            if (cash.ContainsKey(key))
+            if (cache.ContainsKey(key))
             {
-                if (cash[key] is TValue v)
+                if (cache[key] is TValue v)
                 {
                     return v;
                 }
@@ -58,7 +58,7 @@ namespace ConfigDir.Data
             }
 
             TValue value = (TValue)FindValue(key, typeof(TValue), true);
-            cash[key] = value;
+            cache[key] = value;
 
             return value;
         }
@@ -72,14 +72,14 @@ namespace ConfigDir.Data
 
             if (value is null)
             {
-                if (cash.ContainsKey(key))
+                if (cache.ContainsKey(key))
                 {
-                    cash.Remove(key);
+                    cache.Remove(key);
                 }
                 return;
             }
 
-            cash[key] = value;
+            cache[key] = value;
         }
 
         private object FindValue(string key, Type type, bool valueFoundEvent)
