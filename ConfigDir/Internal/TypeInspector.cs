@@ -36,12 +36,12 @@ namespace ConfigDir.Internal
             return TypeCategory.Value;
         }
 
-        static public IEnumerable<PropertyInfo> GetNotImplementedProperties<TConfig>()
+        static public IEnumerable<PropertyInfo> GetNotImplementedProperties(Type type)
         {
             var notImplementedMethods = new List<MethodInfo>();
             var notImplementedProperties = new List<PropertyInfo>();
 
-            var members = typeof(TConfig).GetMembers(flags);
+            var members = type.GetMembers(flags);
             foreach (var mi in members)
             {
                 if (IsInherited(mi))

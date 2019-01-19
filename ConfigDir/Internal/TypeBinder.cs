@@ -45,20 +45,18 @@ namespace ConfigDir.Internal
             TypeDictionary = new Dictionary<Type, Tuple<Type, string[]>>();
         }
 
-        public static TConfig CreateSubConfig<TConfig>(Finder parent, string key)
+        public static object CreateSubConfig(Finder parent, string key, Type type)
         {
-            var config = CreateDynamicInstance<TConfig>(key);
+            var config = CreateDynamicInstance(key, type);
             ((Config)config).Data.SetParent(parent);
-            return (TConfig)config;
+            return config;
         }
 
-        public static object CreateDynamicInstance<TConfig>(string key)
+        public static object CreateDynamicInstance(string key, Type type)
         {
-            var type = typeof(TConfig);
-
             if (!TypeDictionary.ContainsKey(type))
             {
-                var properties = TypeInspector.GetNotImplementedProperties<TConfig>();
+                var properties = TypeInspector.GetNotImplementedProperties(type);
                 TypeDictionary[type] = new Tuple<Type, string[]>
                 (
                     GetDynamicType(type, properties),

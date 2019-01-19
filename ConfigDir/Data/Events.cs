@@ -1,4 +1,6 @@
-﻿namespace ConfigDir.Data
+﻿using System;
+
+namespace ConfigDir.Data
 {
     public partial class Finder
     {
@@ -20,11 +22,11 @@
             throw new System.Exception("Значение не найдено\n" + args);
         }
 
-        private void ValueTypeError(ConfigEventArgs args)
+        private void ValueTypeError(ConfigEventArgs args, Exception ex)
         {
             OnValueTypeError?.Invoke(args);
-            Parent?.ValueTypeError(args);
-            throw new System.Exception("Не удалось привести значение к типу\n" + args);
+            Parent?.ValueTypeError(args, ex);
+            throw new Exception("Не удалось привести значение к типу\n" + args, ex);
         }
 
         private void Validate(string key, object value)

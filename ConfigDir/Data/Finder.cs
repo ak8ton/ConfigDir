@@ -57,7 +57,7 @@ namespace ConfigDir.Data
                 }
             }
 
-            TValue value = FindValue<TValue>(key);
+            TValue value = (TValue)FindValue(key, typeof(TValue), true);
             cash[key] = value;
 
             return value;
@@ -67,40 +67,51 @@ namespace ConfigDir.Data
         {
             if (string.IsNullOrWhiteSpace(key))
             {
-                throw new ArgumentException(nameof(key));
+                throw new ArgumentNullException(nameof(key));
             }
 
             if (value is null)
             {
-                throw new ArgumentException(nameof(value));
+                if (cash.ContainsKey(key))
+                {
+                    cash.Remove(key);
+                }
+                return;
             }
 
             cash[key] = value;
         }
 
-        private TValue FindValue<TValue>(string key)
+        private object FindValue(string key, Type type, bool valueFoundEvent)
         {
-            switch (TypeInspector.GetTypeCategory(typeof(TValue)))
+            switch (TypeInspector.GetTypeCategory(type))
             {
                 case TypeCategory.Value:
-                    return FindPrimitiveValue<TValue>(key);
+                    return FindPrimitiveValue(key, type, valueFoundEvent);
                 case TypeCategory.Config:
-                    return TypeBinder.CreateSubConfig<TValue>(this, key);
+                    return TypeBinder.CreateSubConfig(this, key, type);
+
+                // todo Array
 
                 default:
-                    throw new NotImplementedException("GetValue<TValue>(string key)");
+                    throw new NotImplementedException($"GetValue<{type.FullName}>({key})");
             }
         }
 
-        private TValue FindPrimitiveValue<TValue>(string key)
+        private object FindPrimitiveValue(string key, Type type, bool valueFoundEvent)
         {
             foreach (var value in FindAllValues(key))
             {
                 if (value.Type == ValueOrSourceType.value)
                 {
-                    var v = ChangeType<TValue>(value);
-                    Validate(key, v);
-                    ValueFound(value.ToEventArgs(v));
+                    var v = TryChangeType(value, type);
+
+                    if (valueFoundEvent)
+                    {
+                        Validate(key, v);
+                        ValueFound(value.ToEventArgs(v));
+                    }
+
                     return v;
                 }
 
@@ -109,25 +120,12 @@ namespace ConfigDir.Data
                     ValueNotFound(value.ToEventArgs(this.GetPath(key)));
                 }
 
-                ValueTypeError(value.ToEventArgs());
+                ValueTypeError(value.ToEventArgs(), null);
                 break;
             }
 
             ValueNotFound(new ConfigEventArgs { Path = this.GetPath(key) });
             throw new Exception();
-        }
-
-        private TValue ChangeType<TValue>(ValueOrSource value)
-        {
-            try
-            {
-                return (TValue)Convert.ChangeType(value.Value, typeof(TValue));
-            }
-            catch
-            {
-                ValueTypeError(value.ToEventArgs());
-                throw;
-            }
         }
 
         private readonly List<ISource> deck = new List<ISource>();

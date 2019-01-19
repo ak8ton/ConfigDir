@@ -33,7 +33,7 @@ namespace ConfigDir.Readers
             key = key.ToLower();
             if (Dict.ContainsKey(key))
             {
-               yield return Dict[key];
+                yield return Dict[key];
             }
         }
 
@@ -45,10 +45,10 @@ namespace ConfigDir.Readers
         private Dictionary<string, object> Parse()
         {
             var dict = new Dictionary<string, object>();
-            var nodes = new List<XElement>(); 
+            var nodes = new List<XElement>();
 
             //TODO Обработка ошибок IO
-            foreach (var el in (element ?? XDocument.Load( System.IO.Path.Combine(BasePath, FilePath)).Root).Elements())
+            foreach (var el in (element ?? XDocument.Load(System.IO.Path.Combine(BasePath, FilePath)).Root).Elements())
             {
                 string key = el.Name.LocalName.ToLower();
                 object value = GetValue(el);
@@ -56,13 +56,13 @@ namespace ConfigDir.Readers
 
                 if (dict.ContainsKey(key))
                 {
-                    if (dict[key] is List<object> array)
+                    if (dict[key] is ArrayValue array)
                     {
                         array.Add(value);
                     }
                     else
                     {
-                        dict[key] = new List<object> { dict[key], value };
+                        dict[key] = new ArrayValue(dict[key], value);
                     }
                 }
                 else
