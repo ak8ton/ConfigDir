@@ -10,7 +10,7 @@ namespace ConfigDir
     /// <summary>
     /// Базовый класс привязки
     /// </summary>
-    public abstract class Config
+    public abstract class Config : IConfig
     {
         public Finder Finder { get; private set; }
 
@@ -21,14 +21,16 @@ namespace ConfigDir
             Finder = finder;
         }
 
+        public virtual void Validate(string key, object value) { }
+
+        // static
+
         public static string BasePath { get; set; } = System.IO.Directory.GetCurrentDirectory();
 
         public static TConfig GetOrCreate<TConfig>(string path) where TConfig : class
         {
             return GetOrCreate<TConfig>(path, null);
         }
-
-        public virtual void Validate(string key, object value) { }
 
         public static TConfig GetOrCreate<TConfig>(string path, Action<TConfig> init) where TConfig : class
         {
