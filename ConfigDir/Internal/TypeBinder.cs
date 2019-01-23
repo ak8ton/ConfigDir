@@ -28,7 +28,7 @@ namespace ConfigDir.Internal
         {
             var getterName = nameof(Finder.GetValue);
             var setterName = nameof(Finder.SetValue);
-            var dataGetterName = nameof(Config.Data);
+            var dataGetterName = nameof(Config.Finder);
 
             BaseConfigType = typeof(Config);
 
@@ -48,7 +48,7 @@ namespace ConfigDir.Internal
         public static object CreateSubConfig(Finder parent, string key, Type type)
         {
             var config = CreateDynamicInstance(key, type);
-            ((Config)config).Data.SetParent(parent);
+            ((Config)config).Finder.SetParent(parent);
             return config;
         }
 

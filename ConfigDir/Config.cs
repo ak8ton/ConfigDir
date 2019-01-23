@@ -12,13 +12,13 @@ namespace ConfigDir
     /// </summary>
     public abstract class Config
     {
-        public Finder Data { get; private set; }
+        public Finder Finder { get; private set; }
 
         internal void SetFinder(Finder finder)
         {
-            if (Data != null) throw new Exception("Data != null");
+            if (Finder != null) throw new Exception("Data != null");
             finder.OnValidate += Validate;
-            Data = finder;
+            Finder = finder;
         }
 
         public static string BasePath { get; set; } = System.IO.Directory.GetCurrentDirectory();
@@ -48,7 +48,7 @@ namespace ConfigDir
 
             var key = Utils.GetRelativePath(BasePath, path);
             var config = (TConfig)TypeBinder.CreateDynamicInstance(key, typeof(TConfig));
-            (config as Config).Data.Extend(new DirSource(BasePath, key));
+            (config as Config).Finder.Extend(new DirSource(BasePath, key));
             init?.Invoke(config);
             cache[path] = config;
             return config;

@@ -9,9 +9,10 @@ namespace ConfigDir.Data
     {
         #region Instance
 
+        // TODO remove
         Type ConfigType { get; }
 
-        internal Finder(Type configType, string key, string[] keys)
+        internal Finder(Type configType, string key, IEnumerable<string> keys)
         {
             ConfigType = configType;
             Key = key;
@@ -31,8 +32,9 @@ namespace ConfigDir.Data
 
         private readonly Dictionary<string, object> cache = new Dictionary<string, object>();
 
-        public string[] Keys { get; }
+        public IEnumerable<string> Keys { get; }
 
+        // TODO move to Config class or Config extension
         internal Type GetValueType(string key)
         {
             return ConfigType?.GetProperty(key)?.PropertyType;

@@ -12,7 +12,7 @@ namespace UnitTests
         {
             var cfg = Config.GetOrCreate<Model.Configuration>("Config");
 
-            cfg.Data.OnValueFound += (o) =>
+            cfg.Finder.OnValueFound += (o) =>
             {
                 Assert.AreEqual("Config/Stend/Name", o.Path);
                 Assert.AreEqual("Stend1", o.Value);
@@ -32,7 +32,7 @@ namespace UnitTests
         {
             var cfg = Config.GetOrCreate<Model.Configuration>("Config");
 
-            cfg.Data.OnValueNotFound += (o) =>
+            cfg.Finder.OnValueNotFound += (o) =>
             {
                 Assert.AreEqual("Config/Filename/Options/Value5", o.Path);
                 Assert.AreEqual(null, o.Value);
@@ -52,7 +52,7 @@ namespace UnitTests
         {
             var cfg = Config.GetOrCreate<Model.Configuration>("Config");
 
-            cfg.Data.OnValueNotFound += (o) =>
+            cfg.Finder.OnValueNotFound += (o) =>
             {
                 Assert.AreEqual("Config/NotExsists/Value5", o.Path);
                 Assert.AreEqual(null, o.Value);
@@ -72,7 +72,7 @@ namespace UnitTests
         {
             var cfg = Config.GetOrCreate<Model.Configuration>("Config");
 
-            cfg.Data.OnValueTypeError += (o) =>
+            cfg.Finder.OnValueTypeError += (o) =>
             {
                 Assert.AreEqual("Config/TypeError/NotIntegerValue", o.Path);
                 Assert.AreEqual(null, o.Value);
@@ -92,7 +92,7 @@ namespace UnitTests
         {
             var cfg = Config.GetOrCreate<Model.Configuration>("Config");
 
-            cfg.Data.OnValueTypeError += (o) =>
+            cfg.Finder.OnValueTypeError += (o) =>
             {
                 Assert.AreEqual("Config/TypeError/NotSubConfig", o.Path);
                 Assert.AreEqual(null, o.Value);
