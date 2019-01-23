@@ -45,14 +45,7 @@ namespace ConfigDir.Internal
             TypeDictionary = new Dictionary<Type, Tuple<Type, string[]>>();
         }
 
-        public static object CreateSubConfig(Finder parent, string key, Type type)
-        {
-            var config = CreateDynamicInstance(key, type);
-            ((Config)config).Finder.SetParent(parent);
-            return config;
-        }
-
-        public static object CreateDynamicInstance(string key, Type type)
+        public static object CreateDynamicInstance(string key, Type type, Finder parent)
         {
             if (!TypeDictionary.ContainsKey(type))
             {
@@ -66,7 +59,7 @@ namespace ConfigDir.Internal
 
             var c = TypeDictionary[type];
             var instance = Activator.CreateInstance(c.Item1);
-            var finder = new Finder(type, key, c.Item2);
+            var finder = new Finder(type, key, c.Item2, parent);
             ((Config)instance).SetFinder(finder);
             return instance;
         }

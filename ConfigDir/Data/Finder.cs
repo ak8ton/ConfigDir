@@ -9,20 +9,20 @@ namespace ConfigDir.Data
     {
         #region Instance
 
-        // TODO remove
+        // TODO public property
         Type ConfigType { get; }
 
-        internal Finder(Type configType, string key, IEnumerable<string> keys)
+        internal Finder(Type configType, string key, IEnumerable<string> keys, Finder parent)
         {
+            Parent = parent;
             ConfigType = configType;
             Key = key;
             Keys = keys;
-        }
 
-        internal void SetParent(Finder parent)
-        {
-            Parent = parent;
-            deck.Add(new ParentSource(this, parent, Key));
+            if (parent != null)
+            {
+                deck.Add(new ParentSource(this));
+            }
         }
 
         #endregion Instance
@@ -34,7 +34,7 @@ namespace ConfigDir.Data
 
         public IEnumerable<string> Keys { get; }
 
-        // TODO move to Config class or Config extension
+        // TODO move to extension
         internal Type GetValueType(string key)
         {
             return ConfigType?.GetProperty(key)?.PropertyType;
@@ -91,7 +91,7 @@ namespace ConfigDir.Data
                 case TypeCategory.Value:
                     return FindPrimitiveValue(key, type, valueFoundEvent);
                 case TypeCategory.Config:
-                    return TypeBinder.CreateSubConfig(this, key, type);
+                    return TypeBinder.CreateDynamicInstance(key, type, this);
 
                 // todo Array
 
@@ -132,8 +132,8 @@ namespace ConfigDir.Data
 
         private readonly List<ISource> deck = new List<ISource>();
 
-        public Finder Parent { get; private set; }
-        public string Key { get; private set; }
+        public Finder Parent { get; }
+        public string Key { get; }
 
         public Finder Update(ISource source)
         {

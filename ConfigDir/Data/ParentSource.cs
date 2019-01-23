@@ -8,21 +8,17 @@ namespace ConfigDir.Data
     {
         private class ParentSource : ISource
         {
-            private readonly Finder thisConfig;
-            private readonly Finder parentConfig;
-            private readonly string parentKey;
-            public string Description => parentConfig.Description;
+            private readonly Finder finder;
+            public string Description => finder.Parent.Description;
 
-            public ParentSource(Finder config, Finder parent, string key)
+            public ParentSource(Finder config)
             {
-                thisConfig = config;
-                parentConfig = parent;
-                parentKey = key;
+                finder = config;
             }
 
             public IEnumerable<object> GetAllValues(string key)
             {
-                foreach (var value in parentConfig.FindAllValues(parentKey))
+                foreach (var value in finder.Parent.FindAllValues(finder.Key))
                 {
                     switch (value.Type)
                     {
@@ -43,11 +39,11 @@ namespace ConfigDir.Data
                                 }
                                 else if (obj is ISource src)
                                 {
-                                    yield return ValueOrSource.MkSource(thisConfig, src, key);
+                                    yield return ValueOrSource.MkSource(finder, src, key);
                                 }
                                 else
                                 {
-                                    yield return ValueOrSource.MkValue(thisConfig, value.Source, obj, key);
+                                    yield return ValueOrSource.MkValue(finder, value.Source, obj, key);
                                 }
                             }
                             break;

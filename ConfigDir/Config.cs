@@ -47,7 +47,7 @@ namespace ConfigDir
             }
 
             var key = Utils.GetRelativePath(BasePath, path);
-            var config = (TConfig)TypeBinder.CreateDynamicInstance(key, typeof(TConfig));
+            var config = (TConfig)TypeBinder.CreateDynamicInstance(key, typeof(TConfig), null);
             (config as Config).Finder.Extend(new DirSource(BasePath, key));
             init?.Invoke(config);
             cache[path] = config;
