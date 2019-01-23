@@ -6,6 +6,7 @@
     <Version>1.0.2-alpha</Version>
     <AssemblyName>ConfigDir</AssemblyName>
     <RootNamespace>ConfigDir</RootNamespace>
+    <PackageLicenseUrl>https://licenses.nuget.org/MIT</PackageLicenseUrl>
   </PropertyGroup>
 
 </Project>
