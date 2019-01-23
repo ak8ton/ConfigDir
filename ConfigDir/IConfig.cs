@@ -2,8 +2,14 @@
 
 namespace ConfigDir
 {
+    /// <summary>
+    /// Configuration base interface
+    /// </summary>
     public interface IConfig
     {
-         Finder Finder { get; }
+        /// <summary>
+        /// Finder object
+        /// </summary>
+        Finder Finder { get; }
     }
 }

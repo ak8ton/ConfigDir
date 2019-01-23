@@ -2,33 +2,40 @@
 
 namespace ConfigDir.Data
 {
+    /// <summary>
+    /// Config event options
+    /// </summary>
     public class ConfigEventArgs
     {
         /// <summary>
-        /// Путь
+        /// Path of value
         /// </summary>
         public string Path { get; internal set; } = "";
 
         /// <summary>
-        /// Источник
+        /// Source of value
         /// </summary>
         public ISource Source { get; internal set; } = null;
 
         /// <summary>
-        /// Значение с требуемым типом
+        /// Typed value
         /// </summary>
         public object Value { get; internal set; } = null;
 
         /// <summary>
-        /// Значение с исходным типом
+        /// Raw value
         /// </summary>
         public object RawValue { get; internal set; } = null;
 
         /// <summary>
-        /// Тип значения
+        /// Expected type of value
         /// </summary>
         public System.Type ExpectedType { get; internal set; } = null;
 
+        /// <summary>
+        /// Get string representation of ConfigEventArgs
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             var lines = new List<string>();

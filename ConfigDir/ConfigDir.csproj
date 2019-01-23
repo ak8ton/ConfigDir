@@ -8,5 +8,9 @@
     <RootNamespace>ConfigDir</RootNamespace>
     <PackageLicenseUrl>https://licenses.nuget.org/MIT</PackageLicenseUrl>
   </PropertyGroup>
-
+  
+  <PropertyGroup  Condition=" '$(Configuration)' == 'Release' ">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  
 </Project>

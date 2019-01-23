@@ -3,24 +3,12 @@ using System;
 
 namespace ConfigDir.Internal
 {
-    /// <summary>
-    /// Результат поиска
-    /// </summary>
     struct ValueOrSource
     {
-        /// <summary>
-        /// Тип значения
-        /// </summary>
         public ValueOrSourceType Type { get; }
 
-        /// <summary>
-        /// Источник в котором было найдено значение
-        /// </summary>
         public ISource Source { get; }
 
-        /// <summary>
-        /// Найденое значение
-        /// </summary>
         public object Value { get; }
 
         private readonly Finder finder;

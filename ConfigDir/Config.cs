@@ -8,10 +8,13 @@ using System.Collections.Generic;
 namespace ConfigDir
 {
     /// <summary>
-    /// Базовый класс привязки
+    /// Binding base class
     /// </summary>
     public abstract class Config : IConfig
     {
+        /// <summary>
+        /// Finder object
+        /// </summary>
         public Finder Finder { get; private set; }
 
         internal void SetFinder(Finder finder)
@@ -21,17 +24,38 @@ namespace ConfigDir
             Finder = finder;
         }
 
+        /// <summary>
+        /// Custom validation
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public virtual void Validate(string key, object value) { }
 
         // static
 
+        /// <summary>
+        /// Default base path of config directory
+        /// </summary>
         public static string BasePath { get; set; } = System.IO.Directory.GetCurrentDirectory();
 
+        /// <summary>
+        /// Bind directory to configuration object
+        /// </summary>
+        /// <typeparam name="TConfig"></typeparam>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static TConfig GetOrCreate<TConfig>(string path) where TConfig : class
         {
             return GetOrCreate<TConfig>(path, null);
         }
 
+        /// <summary>
+        /// Bind directory to configuration object
+        /// </summary>
+        /// <typeparam name="TConfig"></typeparam>
+        /// <param name="path"></param>
+        /// <param name="init"></param>
+        /// <returns></returns>
         public static TConfig GetOrCreate<TConfig>(string path, Action<TConfig> init) where TConfig : class
         {
             path = GetAbsolutePath(path);
@@ -56,6 +80,9 @@ namespace ConfigDir
             return config;
         }
 
+        /// <summary>
+        /// Clear main cache
+        /// </summary>
         public static void ResetAll()
         {
             cache.Clear();

@@ -4,9 +4,24 @@ namespace ConfigDir.Data
 {
     public partial class Finder
     {
+        /// <summary>
+        /// Value found error event
+        /// </summary>
         public event ConfigEventHandler OnValueFound;
+
+        /// <summary>
+        /// Value not found error event
+        /// </summary>
         public event ConfigEventHandler OnValueNotFound;
+
+        /// <summary>
+        /// Value type casting error event
+        /// </summary>
         public event ConfigEventHandler OnValueTypeError;
+
+        /// <summary>
+        /// Validate value event
+        /// </summary>
         public event ValidateEventHandler OnValidate;
 
         private void ValueFound(ConfigEventArgs args)

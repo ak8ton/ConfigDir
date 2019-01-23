@@ -5,6 +5,9 @@ using System.Collections.Generic;
 
 namespace ConfigDir.Data
 {
+    /// <summary>
+    /// Config values finder
+    /// </summary>
     public partial class Finder
     {
         #region Instance
@@ -27,11 +30,16 @@ namespace ConfigDir.Data
 
         #endregion Instance
 
-
+        /// <summary>
+        /// Finder description
+        /// </summary>
         public string Description { get; set; } = "";
 
         private readonly Dictionary<string, object> cache = new Dictionary<string, object>();
 
+        /// <summary>
+        /// List of existing keys
+        /// </summary>
         public IEnumerable<string> Keys { get; }
 
         // TODO move to extension
@@ -40,6 +48,12 @@ namespace ConfigDir.Data
             return ConfigType?.GetProperty(key)?.PropertyType;
         }
 
+        /// <summary>
+        /// Get value by key and type
+        /// </summary>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public TValue GetValue<TValue>(string key)
         {
             if (string.IsNullOrWhiteSpace(key))
@@ -65,6 +79,11 @@ namespace ConfigDir.Data
             return value;
         }
 
+        /// <summary>
+        /// Set value of key
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public void SetValue(string key, object value)
         {
             if (string.IsNullOrWhiteSpace(key))
@@ -132,15 +151,32 @@ namespace ConfigDir.Data
 
         private readonly List<ISource> deck = new List<ISource>();
 
+        /// <summary>
+        /// Farent Finder
+        /// </summary>
         public Finder Parent { get; }
+
+        /// <summary>
+        /// Key of Finder in parent Finder
+        /// </summary>
         public string Key { get; }
 
+        /// <summary>
+        /// Add new and override existing values
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
         public Finder Update(ISource source)
         {
             deck.Insert(0, source);
             return this;
         }
 
+        /// <summary>
+        /// Add new values only
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
         public Finder Extend(ISource source)
         {
             deck.Add(source);

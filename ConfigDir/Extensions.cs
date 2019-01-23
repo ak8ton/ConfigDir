@@ -4,8 +4,17 @@ using ConfigDir.Data;
 
 namespace ConfigDir
 {
+    /// <summary>
+    /// Finder extensions methods
+    /// </summary>
     public static class Extensions
     {
+        /// <summary>
+        /// Get path string
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="lastKay"></param>
+        /// <returns></returns>
         public static string GetPath(this Finder config, string lastKay)
         {
             return string.Join("/", GetPathItems(config, lastKay));
