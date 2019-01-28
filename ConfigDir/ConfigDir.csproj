@@ -3,13 +3,13 @@
   <PropertyGroup>
     <TargetFrameworks>net471;netcoreapp2.1</TargetFrameworks>
     <RepositoryUrl>https://github.com/ak8ton/ConfigDir</RepositoryUrl>
-    <Version>1.0.2-alpha</Version>
+    <Version>1.0.3-alpha</Version>
     <AssemblyName>ConfigDir</AssemblyName>
     <RootNamespace>ConfigDir</RootNamespace>
     <PackageLicenseUrl>https://licenses.nuget.org/MIT</PackageLicenseUrl>
   </PropertyGroup>
   
-  <PropertyGroup  Condition=" '$(Configuration)' == 'Release' ">
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   
