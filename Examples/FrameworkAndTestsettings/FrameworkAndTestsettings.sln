@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2050
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{CB356C06-DED0-45FA-BC93-086887507534}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testsettings", "Testsettings", "{A0108530-B023-4842-8F6B-F478141A73C2}"
+	ProjectSection(SolutionItems) = preProject
+		Testsettings\StandA-deploy.cmd = Testsettings\StandA-deploy.cmd
+		Testsettings\StandA.testsettings = Testsettings\StandA.testsettings
+		Testsettings\StandB-deploy.cmd = Testsettings\StandB-deploy.cmd
+		Testsettings\StandB.testsettings = Testsettings\StandB.testsettings
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AllConfigurations", "AllConfigurations", "{7161D8DA-D4CD-440B-AE46-CB31E87EC7A4}"
+	ProjectSection(SolutionItems) = preProject
+		AllConfigurations\Base-Config-10.xml = AllConfigurations\Base-Config-10.xml
+		AllConfigurations\Base-Names-10.xml = AllConfigurations\Base-Names-10.xml
+		AllConfigurations\Stand_A-Config-100.xml = AllConfigurations\Stand_A-Config-100.xml
+		AllConfigurations\Stand_B-Config-100.xml = AllConfigurations\Stand_B-Config-100.xml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Names-30", "Names-30", "{8D4E6689-A671-4085-905C-9AA244ADCCA3}"
+	ProjectSection(SolutionItems) = preProject
+		AllConfigurations\Names-30\Stand_A-Services-100.xml = AllConfigurations\Names-30\Stand_A-Services-100.xml
+		AllConfigurations\Names-30\Stand_B-Services-100.xml = AllConfigurations\Names-30\Stand_B-Services-100.xml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CB356C06-DED0-45FA-BC93-086887507534}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB356C06-DED0-45FA-BC93-086887507534}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CB356C06-DED0-45FA-BC93-086887507534}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CB356C06-DED0-45FA-BC93-086887507534}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8D4E6689-A671-4085-905C-9AA244ADCCA3} = {7161D8DA-D4CD-440B-AE46-CB31E87EC7A4}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A8034373-2A59-4917-9D75-B3FC6262EA91}
+	EndGlobalSection
+EndGlobal
