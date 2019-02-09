@@ -1,4 +1,7 @@
 ﻿<TypeError>
   <NotIntegerValue>NotInteger</NotIntegerValue>
   <NotSubConfig>NotSubConfig</NotSubConfig>
+  <EmptyValueHolder>
+    <EmptyValue/>
+  </EmptyValueHolder>
 </TypeError>

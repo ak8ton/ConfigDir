@@ -40,9 +40,9 @@ namespace ConfigDir.Data
         {
             var lines = new List<string>();
 
-            if (Source != null)
+            if (Source?.Description != null)
             {
-                lines.Add("Source: " + Source);
+                lines.Add("Source: " + Source.Description);
             }
 
             if (!string.IsNullOrWhiteSpace(Path))

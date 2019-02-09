@@ -105,5 +105,25 @@ namespace UnitTests
 
             var s = cfg.TypeError.NotSubConfig.Value1;
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(StopTestException))]
+        public void ValueTypeError_EmptyValue()
+        {
+            var cfg = Config.GetOrCreate<Model.Configuration>("Config");
+
+            cfg.Finder.OnValueTypeError += (o) =>
+            {
+                Assert.AreEqual("Config/TypeError/NotSubConfig", o.Path);
+                Assert.AreEqual(null, o.Value);
+                Assert.AreEqual("NotSubConfig", o.RawValue);
+                Assert.AreEqual(typeof(Model.IOptions), o.ExpectedType);
+                Assert.AreEqual("XML файл: Config\\TypeError.xml", o.Source.Description);
+
+                throw new StopTestException();
+            };
+
+            var s = cfg.TypeError.EmptyValueHolder.EmptyValue;
+        }
     }
 }

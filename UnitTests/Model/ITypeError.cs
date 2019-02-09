@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace UnitTests.Model
+﻿namespace UnitTests.Model
 {
     public interface ITypeError
     {
         int NotIntegerValue { get; }
         IOptions NotSubConfig { get; }
+        IEmptyValueHolder EmptyValueHolder { get; }
+    }
+
+    public interface IEmptyValueHolder
+    {
+        string EmptyValue { get; }
     }
 }
