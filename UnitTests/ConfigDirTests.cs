@@ -10,13 +10,13 @@ namespace UnitTests
         public void TestMethod1()
         {
             var cfg = Config.GetOrCreate<Model.Configuration>("Config");
-            Assert.AreEqual("Stend1", cfg.Stend.Name);
+            Assert.AreEqual("Stand1", cfg.Stand.Name);
 
-            cfg.Stend.Changeable = "Hello";
+            cfg.Stand.Changeable = "Hello";
 
-            Assert.AreEqual("Hello", cfg.Stend.Changeable);
+            Assert.AreEqual("Hello", cfg.Stand.Changeable);
             cfg = Config.GetOrCreate<Model.Configuration>("Config");
-            Assert.AreEqual("Hello", cfg.Stend.Changeable);
+            Assert.AreEqual("Hello", cfg.Stand.Changeable);
         }
     }
 }

@@ -14,16 +14,16 @@ namespace UnitTests
 
             cfg.Finder.OnValueFound += (o) =>
             {
-                Assert.AreEqual("Config/Stend/Name", o.Path);
-                Assert.AreEqual("Stend1", o.Value);
-                Assert.AreEqual("Stend1", o.RawValue);
+                Assert.AreEqual("Config/Stand/Name", o.Path);
+                Assert.AreEqual("Stand1", o.Value);
+                Assert.AreEqual("Stand1", o.RawValue);
                 Assert.AreEqual(typeof(string), o.ExpectedType);
-                Assert.AreEqual("XML файл: Config\\Stend.xml", o.Source.Description);
+                Assert.AreEqual("XML файл: Config\\Stand.xml", o.Source.Description);
 
                 throw new StopTestException();
             };
 
-            var s = cfg.Stend.Name;
+            var s = cfg.Stand.Name;
         }
 
         [TestMethod]

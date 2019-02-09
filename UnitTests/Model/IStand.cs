@@ -1,9 +1,6 @@
-﻿using ConfigDir;
-
-
-namespace UnitTests.Model
+﻿namespace UnitTests.Model
 {
-    public interface IStend
+    public interface IStand
     {
         string Name { get; }
         string Changeable { get; set; }
