@@ -1,0 +1,17 @@
+<Config>
+  <TypedValues>
+    <Value1>Base-Config-10.xml</Value1>
+
+    <IntValue1>500</IntValue1>
+    <IntValue2>Не корректное целочисленное значение</IntValue2>
+    <IntValue3>-1</IntValue3>
+
+    <Customer>
+      <Id>2093847</Id>
+      <Name>Customer</Name>
+    </Customer>
+
+    <Service1>48374</Service1>
+    <Service2>99372</Service2>
+  </TypedValues>
+</Config>

@@ -1,7 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using static UnitTests.Settings;
+
 
 //
 // ПРИМЕР ИСПОЛЬЗОВАНИЯ КОНФИГУРАЦИИ CONFIG_DIR
@@ -37,9 +38,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
  * 
  */
 
-namespace ut
+namespace UnitTests
 {
+    //
     // Класс для доступа к параметрам конфигурации
+    //
+
     public static class Settings
     {
         // При развёртывании проекта
@@ -93,6 +97,10 @@ namespace ut
         }
     }
 
+    //
+    // Описание модели данных 
+    //
+
     // Привязка к типам выполняется через описание
     // интерфейса или абстрактного класса
     // с нереализованными (abstract) свойствами
@@ -109,7 +117,8 @@ namespace ut
         [ConfigDir.Summary("Имена сущьностей. Завият от тестового стенда")]
         INames Names { get; }
 
-
+        [ConfigDir.Summary("Конфигурация")]
+        IConfig Config { get; }
     }
 
     // Привязка к интерфейсу
@@ -128,18 +137,12 @@ namespace ut
     // Класс должен быть унаследован от Config
     public abstract class Services : ConfigDir.Config
     {
-        [ConfigDir.Summary("Хороший код")]
-        public abstract string ServiceCode1 { get; }
-
-        [ConfigDir.Summary("Плохой код")]
-        public abstract string ServiceCode2 { get; }
-
-        [ConfigDir.Summary("Этот код отсутствует на стенде 'B'")]
-        public abstract string ServiceCode3 { get; }
+        public abstract string Service1 { get; }
+        public abstract string Service2 { get; }
+        public abstract string Service3 { get; }
 
         // В классе можно реализовать
         // кастомную валидацию значений
-        // переорпеделив виртуальный метод
         public override void Validate(string key, object value)
         {
             Console.WriteLine();
@@ -158,9 +161,20 @@ namespace ut
         }
     }
 
-    #region Приведение типов
-    //todo Не реализовано
+    public interface IConfig
+    {
+        [ConfigDir.Summary("Значения этих параметров отсутствуют в файлах конфигурации")]
+        INames NotDefinedNames { get; }
 
+        [ConfigDir.Summary("Примеры значений различных типов")]
+        ITypedValues TypedValues { get; }
+    }
+
+    //
+    // Приведение типов 
+    //
+
+    #region Приведение типов
     /*
      * 
      * Как показано выше,
@@ -177,11 +191,11 @@ namespace ut
      *    - Тип реализующий интерфейс IConvertible
      *    - Класс с конструктором без параметров и публичными свойствами, доступными для записи
      *    - Класс с конструктором с одним параметром типа Т
-     *    - IEnumerable<T> - Не реализовано
-     *    - ICollection<T> - Не реализовано
-     *    - Произвольный тип, при наличии метода ConvertTo* в содержащем это свойство классе. Не реализовано
-     *    - (T Name... ) - Кортеж. Не реализовано
-     *    - И другие типы. Не реализовано
+     *    - IEnumerable<T> - [Не реализовано]
+     *    - ICollection<T> - [Не реализовано]
+     *    - Произвольный тип, при наличии метода ConvertTo* в содержащем это свойство классе. [Не реализовано]
+     *    - (T Name... ) - Кортеж. [Не реализовано]
+     *    - И другие типы. [Не реализовано]
      *    
      * Все типы не являющиеся вложенными конфигами считаются конечными значениями параметров конфигурации.
      * 
@@ -189,21 +203,109 @@ namespace ut
 
 
     // Примеры конечных значений разных типов
-    public interface IConfig
+    public interface ITypedValues
     {
         // Типы С#
 
+        string Value1 { get; }
+        string Value2 { get; }
+        string Value3 { get; }
+
+        int IntValue1 { get; }
+        int IntValue2 { get; }
+        int IntValue3 { get; }
+
         // Классы
+        Customer Customer { get; }
+
+        Service Service1 { get; }
+        Service Service2 { get; }
 
         //todo Другие типы
+
     }
 
-    // Тип без конструктора
+    // Класс без конструктора
+    public class Customer
+    {
+        public ulong Id { get; }
+        public string Name { get; set; }
+    }
 
-    // Тип с конструктором
+    // Класс с конструктором
+    public class Service
+    {
+        public ulong Id { get; set; }
+        public string Name { get; set; }
+
+        public Service(ulong id)
+        {
+            Id = id;
+            Name = GetName(id);
+        }
+
+        private string GetName(ulong id)
+        {
+            return "Service_" + id;
+        }
+    }
 
 
     #endregion Приведение типов
+
+    //
+    // Тесты 
+    //
+
+    [TestClass]
+    public class Tests
+    {
+        [TestMethod]
+        public void Dir()
+        {
+            Console.WriteLine("Содержимое папки Config");
+            Utils.ListDir("Config");
+
+            // ВЫВОД для StandA.testsettings
+
+            /*
+             
+             */
+        }
+
+        [TestMethod]
+        public void PrintConfigs()
+        {
+            Console.WriteLine("Содержимое файлов конфигурации");
+            Utils.PrintConfig("Config");
+
+            // ВЫВОД для StandA.testsettings
+            
+            /*
+             
+             */
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(Exception))]
+        public void ValueNotFoundError()
+        {
+            var s2 = Cfg.Config.NotDefinedNames.Services.Service2;
+
+            // ВЫВОД
+            // Ошибка. Значение не найдено
+            // Path: Config/NotDefinedNames/Services/Service2
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(Exception))]
+        public void ValueTypeError()
+        {
+            var i2 = Cfg.Config.TypedValues.IntValue2;
+
+            // ВЫВОД
+        }
+    }
 
     [TestClass]
     public class StandA_Tests
@@ -216,4 +318,7 @@ namespace ut
 
         }
     }
+
+
+
 }

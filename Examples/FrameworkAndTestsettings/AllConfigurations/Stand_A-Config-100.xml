@@ -1,0 +1,11 @@
+<Config>
+  <Names>
+  
+    <StandName>Stand_A</StandName>
+    
+    <Services>
+      <Service1>Stand_A. Bad service code</Service1>
+    </Services>
+
+  </Names>
+</Config>

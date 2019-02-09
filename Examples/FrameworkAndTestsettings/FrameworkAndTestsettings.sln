@@ -23,8 +23,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AllConfigurations", "AllCon
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Names-30", "Names-30", "{8D4E6689-A671-4085-905C-9AA244ADCCA3}"
 	ProjectSection(SolutionItems) = preProject
-		AllConfigurations\Names-30\Stand_A-Services-100.xml = AllConfigurations\Names-30\Stand_A-Services-100.xml
-		AllConfigurations\Names-30\Stand_B-Services-100.xml = AllConfigurations\Names-30\Stand_B-Services-100.xml
+		AllConfigurations\Names-30\Stand_A-Services.xml = AllConfigurations\Names-30\Stand_A-Services.xml
+		AllConfigurations\Names-30\Stand_B-Services.xml = AllConfigurations\Names-30\Stand_B-Services.xml
 	EndProjectSection
 EndProject
 Global
