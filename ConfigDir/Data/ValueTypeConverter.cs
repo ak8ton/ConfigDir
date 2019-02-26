@@ -1,4 +1,5 @@
 ﻿using ConfigDir.Internal;
+using ConfigDir.Exceptions;
 using System;
 using System.Reflection;
 
@@ -15,11 +16,9 @@ namespace ConfigDir.Data
             }
             catch (Exception ex)
             {
-                ValueTypeError(value.ToEventArgs(), ex);
-                throw;
+                throw new ValueTypeException("Type conversion error", value, type, ex);
             }
         }
-
 
         private object ChangeType(object value, Type type)
         {
@@ -54,7 +53,7 @@ namespace ConfigDir.Data
                 }
             }
 
-            throw new NotSupportedException($"Тип {type.FullName} не поддерживаются");
+            throw new Exception($"Type {type.FullName} not supported");
         }
 
         private object CreatePropsObject(Type type)

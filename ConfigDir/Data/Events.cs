@@ -1,4 +1,5 @@
 ﻿using System;
+using ConfigDir.Exceptions;
 
 namespace ConfigDir.Data
 {
@@ -10,14 +11,9 @@ namespace ConfigDir.Data
         public event ConfigEventHandler OnValueFound;
 
         /// <summary>
-        /// Value not found error event
+        /// Any config error event
         /// </summary>
-        public event ConfigEventHandler OnValueNotFound;
-
-        /// <summary>
-        /// Value type casting error event
-        /// </summary>
-        public event ConfigEventHandler OnValueTypeError;
+        public event ConfigErrorEventHandler OnConfigError;
 
         /// <summary>
         /// Validate value event
@@ -30,18 +26,22 @@ namespace ConfigDir.Data
             Parent?.ValueFound(args);
         }
 
-        private void ValueNotFound(ConfigEventArgs args)
+        private void ConfigError(ConfigException exception)
         {
-            OnValueNotFound?.Invoke(args);
-            Parent?.ValueNotFound(args);
-            throw new System.Exception("Значение не найдено\n" + args);
-        }
+            var args = new ConfigErrorEventArgs
+            {
+                Exception = exception
+            };
 
-        private void ValueTypeError(ConfigEventArgs args, Exception ex)
-        {
-            OnValueTypeError?.Invoke(args);
-            Parent?.ValueTypeError(args, ex);
-            throw new Exception("Не удалось привести значение к типу\n" + args, ex);
+            OnConfigError?.Invoke(args);
+            Parent?.OnConfigError(args);
+
+            if (args.Exception != null)
+            {
+                throw args.Exception;
+            }
+
+            throw exception;
         }
 
         private void Validate(string key, object value)

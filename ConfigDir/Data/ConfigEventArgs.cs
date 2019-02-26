@@ -8,29 +8,38 @@ namespace ConfigDir.Data
     public class ConfigEventArgs
     {
         /// <summary>
-        /// Path of value
+        /// Key
         /// </summary>
-        public string Path { get; internal set; } = "";
-
-        /// <summary>
-        /// Source of value
-        /// </summary>
-        public ISource Source { get; internal set; } = null;
+        public string Key { get; set; }
 
         /// <summary>
         /// Typed value
         /// </summary>
-        public object Value { get; internal set; } = null;
+        public object Value { get; set; }
 
         /// <summary>
         /// Raw value
         /// </summary>
-        public object RawValue { get; internal set; } = null;
+        public object RawValue { get; set; }
+        
+        /// <summary>
+        /// Source of value
+        /// </summary>
+        public ISource Source { get; set; }
 
         /// <summary>
-        /// Expected type of value
+        /// Finder object
         /// </summary>
-        public System.Type ExpectedType { get; internal set; } = null;
+        public Finder Finder { get; set; }
+
+        /// <summary>
+        /// Path
+        /// </summary>
+        public string Path
+        {
+            get => _path ?? (_path = Finder?.GetPath(Key));
+        }
+        string _path = null;
 
         /// <summary>
         /// Get string representation of ConfigEventArgs
@@ -38,11 +47,12 @@ namespace ConfigDir.Data
         /// <returns></returns>
         public override string ToString()
         {
+            var newLine = "\n";
             var lines = new List<string>();
 
-            if (Source?.Description != null)
+            if (Source != null)
             {
-                lines.Add("Source: " + Source.Description);
+                lines.Add("Source: " + Source.ToString());
             }
 
             if (!string.IsNullOrWhiteSpace(Path))
@@ -60,12 +70,13 @@ namespace ConfigDir.Data
                 lines.Add("RawValue: " + RawValue + " - " + RawValue.GetType().FullName);
             }
 
-            if (ExpectedType != null)
+            var summary = Finder?.GetSummary(Key);
+            if (!string.IsNullOrWhiteSpace(summary))
             {
-                lines.Add("ExpectedType: " + ExpectedType.FullName);
+                lines.Add("Summary: " + summary);
             }
 
-            return string.Join("\n", lines);
+            return string.Join(newLine, lines);
         }
     }
 }

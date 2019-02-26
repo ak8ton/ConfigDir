@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using ConfigDir.Internal;
+using ConfigDir.Exceptions;
 
 
 namespace ConfigDir.Data
@@ -9,7 +10,6 @@ namespace ConfigDir.Data
         private class ParentSource : ISource
         {
             private readonly Finder finder;
-            public string Description => finder.Parent.Description;
 
             public ParentSource(Finder config)
             {
@@ -20,33 +20,27 @@ namespace ConfigDir.Data
             {
                 foreach (var value in finder.Parent.FindAllValues(finder.Key))
                 {
-                    switch (value.Type)
+                    if (value.IsSource)
                     {
-                        case ValueOrSourceType.stop:
-                            yield return value;
-                            break;
-
-                        case ValueOrSourceType.value:
-                            yield return ValueOrSource.MkStop_TypeError(value);
-                            break;
-
-                        case ValueOrSourceType.source:
-                            foreach (var obj in value.Source.GetAllValues(key))
+                        foreach (var obj in value.Source.GetAllValues(key))
+                        {
+                            if (obj is ValueOrSource vos)
                             {
-                                if (obj is ValueOrSource vos)
-                                {
-                                    yield return vos;
-                                }
-                                else if (obj is ISource src)
-                                {
-                                    yield return ValueOrSource.MkSource(finder, src, key);
-                                }
-                                else
-                                {
-                                    yield return ValueOrSource.MkValue(finder, value.Source, obj, key);
-                                }
+                                yield return vos;
                             }
-                            break;
+                            else if (obj is ISource src)
+                            {
+                                yield return ValueOrSource.MkSource(finder, src, key);
+                            }
+                            else
+                            {
+                                yield return ValueOrSource.MkValue(finder, value.Source, obj, key);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        throw new ValueTypeException("Config option has incorrect value. Subsonfig expected", value, typeof(ISource));
                     }
                 }
             }

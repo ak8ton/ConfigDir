@@ -1,4 +1,5 @@
-﻿using ConfigDir.Internal;
+﻿using ConfigDir.Exceptions;
+using ConfigDir.Internal;
 using System;
 using System.Collections.Generic;
 
@@ -12,8 +13,7 @@ namespace ConfigDir.Data
     {
         #region Instance
 
-        // TODO public property
-        Type ConfigType { get; }
+        public Type ConfigType { get; }
 
         internal Finder(Type configType, string key, IEnumerable<string> keys, Finder parent)
         {
@@ -30,23 +30,12 @@ namespace ConfigDir.Data
 
         #endregion Instance
 
-        /// <summary>
-        /// Finder description
-        /// </summary>
-        public string Description { get; set; } = "";
-
         private readonly Dictionary<string, object> cache = new Dictionary<string, object>();
 
         /// <summary>
         /// List of existing keys
         /// </summary>
         public IEnumerable<string> Keys { get; }
-
-        // TODO move to extension
-        internal Type GetValueType(string key)
-        {
-            return ConfigType?.GetProperty(key)?.PropertyType;
-        }
 
         /// <summary>
         /// Get value by key and type
@@ -121,32 +110,51 @@ namespace ConfigDir.Data
 
         private object FindPrimitiveValue(string key, Type type, bool valueFoundEvent)
         {
-            foreach (var value in FindAllValues(key))
+            try
             {
-                if (value.Type == ValueOrSourceType.value)
+                foreach (var value in FindAllValues(key))
                 {
+                    if (value.IsSource)
+                    {
+                        throw new ValueTypeException("Config option has incorrect value. Subconfig insted of value", value, type);
+                    }
+
+                    if (value.Value == null)
+                    {
+                        throw new ValueIsNullException(value);
+                    }
+
                     var v = TryChangeType(value, type);
 
                     if (valueFoundEvent)
                     {
                         Validate(key, v);
-                        ValueFound(value.ToEventArgs(v));
+
+                        var args = new ConfigEventArgs
+                        {
+                            Key = key,
+                            Value = v,
+                            RawValue = value.Value,
+                            Source = value.Source,
+                            Finder = this
+                        };
+
+                        ValueFound(args);
                     }
 
                     return v;
                 }
-
-                if (value.Value == null)
-                {
-                    ValueNotFound(value.ToEventArgs(this.GetPath(key)));
-                }
-
-                ValueTypeError(value.ToEventArgs(), null);
-                break;
+              
+                throw new ValueNotFoundException();
+            }
+            catch (ConfigException ex)
+            {
+                ex.RequestedFinder = this;
+                ex.RequestedKey = key;
+                ConfigError(ex);
             }
 
-            ValueNotFound(new ConfigEventArgs { Path = this.GetPath(key) });
-            throw new Exception();
+            return null;
         }
 
         private readonly List<ISource> deck = new List<ISource>();
@@ -203,7 +211,6 @@ namespace ConfigDir.Data
                     }
                 }
             }
-            yield return ValueOrSource.MkStop_NotFound(this, key);
         }
     }
 }

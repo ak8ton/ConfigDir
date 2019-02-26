@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using ConfigDir.Data;
+using System;
+using System.Collections.Generic;
 using System.Linq;
-using ConfigDir.Data;
 
 namespace ConfigDir
 {
@@ -40,6 +41,55 @@ namespace ConfigDir
                 path.Add(lastKay);
             }
             return path.ToArray();
+        }
+
+        /// <summary>
+        /// Type of value by key
+        /// </summary>
+        /// <param name="key">Key</param>
+        /// <returns>Type</returns>
+        public static Type GetValueType(this Finder finder, string key)
+        {
+            return finder?.ConfigType?.GetProperty(key)?.PropertyType;
+        }
+
+        /// <summary>
+        /// Summary of value by key
+        /// </summary>
+        /// <param name="key">Key</param>
+        /// <returns>Summary</returns>
+        public static string GetSummary(this Finder finder, string key)
+        {
+            SummaryAttribute attribute = (SummaryAttribute)finder
+                ?.ConfigType
+                ?.GetProperty(key)
+                ?.GetCustomAttributes(typeof(SummaryAttribute), false)
+                ?.FirstOrDefault();
+
+            return attribute?.Summary;
+        }
+
+        public static string GetAllSummaries(this Finder finder, string key)
+        {
+            var newLine = "\n";
+            var lines = new List<string>();
+
+            while (finder != null)
+            {
+                var summary = GetSummary(finder, key);
+                if (!string.IsNullOrWhiteSpace(summary))
+                {
+                    lines.Add(" # "
+                        + GetPath(finder, key)
+                        + newLine
+                        + summary);
+                }
+                key = finder.Key;
+                finder = finder.Parent;
+            }
+
+            lines.Reverse();
+            return string.Join(newLine, lines);
         }
     }
 }
