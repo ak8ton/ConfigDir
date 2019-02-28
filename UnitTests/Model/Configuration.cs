@@ -9,5 +9,6 @@ namespace UnitTests.Model
         public abstract IFilename Filename { get; }
         public abstract IOptions NotExsists { get; }
         public abstract ITypeError TypeError { get; }
+        public abstract Validated Validated { get; }
     }
 }

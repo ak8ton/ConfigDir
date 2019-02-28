@@ -15,10 +15,7 @@ namespace ConfigDir.Data
         /// </summary>
         public event ConfigErrorEventHandler OnConfigError;
 
-        /// <summary>
-        /// Validate value event
-        /// </summary>
-        public event ValidateEventHandler OnValidate;
+        internal event ValidateEventHandler OnValidate;
 
         private void ValueFound(ConfigEventArgs args)
         {
@@ -26,22 +23,15 @@ namespace ConfigDir.Data
             Parent?.ValueFound(args);
         }
 
-        private void ConfigError(ConfigException exception)
+        private void ConfigError(ConfigErrorEventArgs args)
         {
-            var args = new ConfigErrorEventArgs
-            {
-                Exception = exception
-            };
-
             OnConfigError?.Invoke(args);
-            Parent?.OnConfigError(args);
+            Parent?.ConfigError(args);
 
             if (args.Exception != null)
             {
                 throw args.Exception;
             }
-
-            throw exception;
         }
 
         private void Validate(string key, object value)

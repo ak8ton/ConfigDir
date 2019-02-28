@@ -151,7 +151,13 @@ namespace ConfigDir.Data
             {
                 ex.RequestedFinder = this;
                 ex.RequestedKey = key;
-                ConfigError(ex);
+
+                var args = new ConfigErrorEventArgs
+                {
+                    Exception = ex
+                };
+
+                ConfigError(args);
             }
 
             return null;
