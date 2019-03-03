@@ -69,27 +69,24 @@ namespace ConfigDir
             return attribute?.Summary;
         }
 
-        public static string GetAllSummaries(this Finder finder, string key)
+        internal static IEnumerable<string> GetAllSummaries(this Finder finder, string key)
         {
-            var newLine = "\n";
-            var lines = new List<string>();
-
             while (finder != null)
             {
+                if (string.IsNullOrWhiteSpace(key))
+                {
+                    break;
+                }
+
                 var summary = GetSummary(finder, key);
                 if (!string.IsNullOrWhiteSpace(summary))
                 {
-                    lines.Add(" # "
-                        + GetPath(finder, key)
-                        + newLine
-                        + summary);
+                    yield return $"[{key}] summary";
                 }
+
                 key = finder.Key;
                 finder = finder.Parent;
             }
-
-            lines.Reverse();
-            return string.Join(newLine, lines);
         }
     }
 }

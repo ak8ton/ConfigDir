@@ -32,6 +32,17 @@ namespace ConfigDir.Exceptions
                 sb.AppendLine(RequestedPath);
             }
 
+            var h = false;
+            foreach (var summary in RequestedFinder.GetAllSummaries(RequestedKey))
+            {
+                if (!h)
+                {
+                    sb.AppendLine("Summaries:");
+                    h = true;
+                }
+                sb.AppendLine(summary);
+            }
+
             return sb.ToString();
         }
 
