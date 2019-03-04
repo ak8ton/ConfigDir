@@ -13,6 +13,9 @@ namespace ConfigDir.Data
     {
         #region Instance
 
+        /// <summary>
+        /// Config type
+        /// </summary>
         public Type ConfigType { get; }
 
         internal Finder(Type configType, string key, IEnumerable<string> keys, Finder parent)

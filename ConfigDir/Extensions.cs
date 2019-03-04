@@ -46,6 +46,7 @@ namespace ConfigDir
         /// <summary>
         /// Type of value by key
         /// </summary>
+        /// <param name="finder"></param>
         /// <param name="key">Key</param>
         /// <returns>Type</returns>
         public static Type GetValueType(this Finder finder, string key)
@@ -56,6 +57,7 @@ namespace ConfigDir
         /// <summary>
         /// Summary of value by key
         /// </summary>
+        /// <param name="finder"></param>
         /// <param name="key">Key</param>
         /// <returns>Summary</returns>
         public static string GetSummary(this Finder finder, string key)

@@ -6,7 +6,7 @@
     <Version>1.0.3-alpha</Version>
     <AssemblyName>ConfigDir</AssemblyName>
     <RootNamespace>ConfigDir</RootNamespace>
-    <PackageLicenseUrl>https://licenses.nuget.org/MIT</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>    
   </PropertyGroup>
   
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">

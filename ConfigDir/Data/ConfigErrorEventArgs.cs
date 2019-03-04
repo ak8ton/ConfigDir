@@ -7,6 +7,9 @@ using ConfigDir.Exceptions;
 
 namespace ConfigDir.Data
 {
+    /// <summary>
+    /// Error details
+    /// </summary>
     public class ConfigErrorEventArgs
     {
         /// <summary>
