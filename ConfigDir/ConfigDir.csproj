@@ -6,7 +6,8 @@
     <Version>1.0.3-alpha</Version>
     <AssemblyName>ConfigDir</AssemblyName>
     <RootNamespace>ConfigDir</RootNamespace>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>    
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <AssemblyVersion>1.0.4.0</AssemblyVersion>    
   </PropertyGroup>
   
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
