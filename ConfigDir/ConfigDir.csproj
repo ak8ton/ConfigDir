@@ -3,12 +3,10 @@
   <PropertyGroup>
     <TargetFrameworks>net471;netcoreapp2.1</TargetFrameworks>
     <RepositoryUrl>https://github.com/ak8ton/ConfigDir</RepositoryUrl>
-    <Version>1.0.3-alpha</Version>
+    <Version>1.0.4-alpha</Version>
     <AssemblyName>ConfigDir</AssemblyName>
     <RootNamespace>ConfigDir</RootNamespace>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <AssemblyVersion>1.0.4.0</AssemblyVersion>
-    <FileVersion>1.0.4.0</FileVersion>    
   </PropertyGroup>
   
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
