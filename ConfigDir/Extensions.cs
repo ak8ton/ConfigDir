@@ -83,7 +83,7 @@ namespace ConfigDir
                 var summary = GetSummary(finder, key);
                 if (!string.IsNullOrWhiteSpace(summary))
                 {
-                    yield return $"[{key}] summary";
+                    yield return $"[{key}] {summary}";
                 }
 
                 key = finder.Key;

@@ -65,34 +65,17 @@ namespace UnitTests
                 Console.WriteLine("В конфигурации найдено значение параметра:");
                 Console.WriteLine("Путь: " + eventArgs.Path);
                 Console.WriteLine("Значение: " + eventArgs.Value);
-                Console.WriteLine("Источник: " + eventArgs.Source.Description);
+                Console.WriteLine("Источник: " + eventArgs.Source);
                 Console.WriteLine();
-
-                //todo Add Summary
             };
 
             // Обработка ошибок 
-
-            // Если в файлах не найдено значение параметра
-            config.Finder.OnValueNotFound += (eventArgs) =>
+            // Пока реализован только один обработчик для всех типов ошибок
+            config.Finder.OnConfigError += (eventArgs) =>
             {
                 Console.WriteLine();
-                var message = "Ошибка. Значение не найдено\n" + eventArgs;
-                Console.WriteLine(message);
-                throw new Exception(message);
-
-                //todo Add inner exception
-            };
-
-            // Если найденное значение не удалось привести к требуемому типу
-            config.Finder.OnValueTypeError += (eventArgs) =>
-            {
-                Console.WriteLine();
-                var message = "Ошибка. Значение имеет неверный тип\n" + eventArgs;
-                Console.WriteLine(message);
-                throw new Exception(message);
-
-                //todo Add inner exception
+                Console.WriteLine("Ошибка");
+                Console.WriteLine(eventArgs.ToString());
             };
         }
     }
@@ -287,7 +270,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(Exception))]
+        [ExpectedException(typeof(ConfigDir.Exceptions.ValueNotFoundException))]
         public void ValueNotFoundError()
         {
             var s2 = Cfg.Config.NotDefinedNames.Services.Service2;
@@ -298,7 +281,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(Exception))]
+        [ExpectedException(typeof(ConfigDir.Exceptions.ValueTypeException))]
         public void ValueTypeError()
         {
             var i2 = Cfg.Config.TypedValues.IntValue2;
