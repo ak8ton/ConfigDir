@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static UnitTests.Settings;
 
@@ -22,9 +21,10 @@ using static UnitTests.Settings;
  * В проекте представлены две конфигурации тестовых стендов
  * StandA и StandB
  * 
- * Для запуска автотестов необходимо 
+ * Для запуска автотестов необходимо
  * выбрать один из файлов StandA.testsettings или StandB.testsettings
  * в меню Test / Test Settings.
+ * Файлы *.testsettings находятся в пвпке Testsettings
  * 
  * В зависимости от выбранного файла testsettings некоторые тесты
  * будут пройдены успешно, а некоторые упадут
@@ -50,13 +50,16 @@ namespace UnitTests
         // Текущая конфигурация помещается в папку Config
         const string ConfigurationDirectoryName = "Config";
 
-        public static IConfigRoot Cfg => ConfigDir.Config.GetOrCreate<IConfigRoot>(ConfigurationDirectoryName, Init);
+        public static IConfigRoot Cfg => ConfigDir.Config.GetOrCreate<IConfigRoot>(
+            ConfigurationDirectoryName, 
+            Init
+        );
 
         // Настройки логирования и обработки ошибок
         static void Init(IConfigRoot config)
         {
             // Доступ к методам ConfigDir
-            // выполняется через объект Finder
+            // осуществляется через объект Finder
 
             // Логирование параметров конфигурации
             config.Finder.OnValueFound += (eventArgs) =>
@@ -69,8 +72,9 @@ namespace UnitTests
                 Console.WriteLine();
             };
 
-            // Обработка ошибок 
-            // Пока реализован только один обработчик для всех типов ошибок
+            // Обработка ошибок.
+            // Пока реализован только один обработчик 
+            // для всех типов ошибок
             config.Finder.OnConfigError += (eventArgs) =>
             {
                 Console.WriteLine();
@@ -108,10 +112,6 @@ namespace UnitTests
     // Интерфейс можно не наследовать от IConfig 
     public interface INames
     {
-        // Свойство доступное для записи
-        [ConfigDir.Summary("Название тестового стенда")]
-        string StandName { get; set; }
-
         [ConfigDir.Summary("Коды услуг")]
         Services Services { get; }
     }
@@ -146,95 +146,16 @@ namespace UnitTests
 
     public interface IConfig
     {
-        [ConfigDir.Summary("Значения этих параметров отсутствуют в файлах конфигурации")]
+        // Свойство доступное для записи
+        [ConfigDir.Summary("Название тестового стенда")]
+        string StandName { get; set; }
+
+        [ConfigDir.Summary("Значение этого параметров отсутствуют в файлах конфигурации")]
         INames NotDefinedNames { get; }
 
-        [ConfigDir.Summary("Примеры значений различных типов")]
-        ITypedValues TypedValues { get; }
+        [ConfigDir.Summary("Не корректное Целочисленное значение")]
+        int InvalidIntValue { get; }
     }
-
-    //
-    // Приведение типов 
-    //
-
-    #region Приведение типов
-    /*
-     * 
-     * Как показано выше,
-     * переметры конфигурации описываются свойствами вида:
-     * 
-     *    T Name { get; }
-     *    T Name { get; set; }
-     * 
-     * Где T:
-     *    
-     *    - Вложенный конфиг - публичный интерфейс
-     *    - Вложенный конфиг - публичный абстрактный класс унаследованный от ConfigDir.Config
-     *    - Любой стандартный тип языка С# (string, int ...)  
-     *    - Тип реализующий интерфейс IConvertible
-     *    - Класс с конструктором без параметров и публичными свойствами, доступными для записи
-     *    - Класс с конструктором с одним параметром типа Т
-     *    - IEnumerable<T> - [Не реализовано]
-     *    - ICollection<T> - [Не реализовано]
-     *    - Произвольный тип, при наличии метода ConvertTo* в содержащем это свойство классе. [Не реализовано]
-     *    - (T Name... ) - Кортеж. [Не реализовано]
-     *    - И другие типы. [Не реализовано]
-     *    
-     * Все типы не являющиеся вложенными конфигами считаются конечными значениями параметров конфигурации.
-     * 
-     */
-
-
-    // Примеры конечных значений разных типов
-    public interface ITypedValues
-    {
-        // Типы С#
-
-        string Value1 { get; }
-        string Value2 { get; }
-        string Value3 { get; }
-
-        int IntValue1 { get; }
-        int IntValue2 { get; }
-        int IntValue3 { get; }
-
-        // Классы
-        Customer Customer { get; }
-
-        Service Service1 { get; }
-        Service Service2 { get; }
-
-        //todo Другие типы
-
-    }
-
-    // Класс без конструктора
-    public class Customer
-    {
-        public ulong Id { get; }
-        public string Name { get; set; }
-    }
-
-    // Класс с конструктором
-    public class Service
-    {
-        public ulong Id { get; set; }
-        public string Name { get; set; }
-
-        public Service(ulong id)
-        {
-            Id = id;
-            Name = GetName(id);
-        }
-
-        private string GetName(ulong id)
-        {
-            return "Service_" + id;
-        }
-    }
-
-
-    #endregion Приведение типов
 
     //
     // Тесты 
@@ -243,6 +164,8 @@ namespace UnitTests
     [TestClass]
     public class Tests
     {
+        // Проверка результатов развёртывания
+
         [TestMethod]
         public void Dir()
         {
@@ -251,9 +174,11 @@ namespace UnitTests
 
             // ВЫВОД для StandA.testsettings
 
-            /*
-             
-             */
+            // Содержимое папки Config
+            // |- Names-30
+            // |  |- Stand_A-Services.xml
+            // |- Base-Config-10.xml
+            // |- Stand_A-Config-100.xml
         }
 
         [TestMethod]
@@ -263,11 +188,25 @@ namespace UnitTests
             Utils.PrintConfig("Config");
 
             // ВЫВОД для StandA.testsettings
-            
-            /*
-             
-             */
+
+            // Содержимое файлов конфигурации
+            //
+            // # Config\Base-Config-10.xml
+            //  <StandName>Название стенда. Stand_A или Stand_B</StandName>
+            //  <InvalidIntValue>Не число</InvalidIntValue>
+            //
+            //
+            // # Config\Names-30\Stand_A-Services.xml
+            //  <Service1>BAD_CODE_A</Service1>
+            //  <Service2>GOOD_CODE_A</Service2>
+            //
+            //
+            // # Config\Stand_A-Config-100.xml
+            //  <StandName>Stand_A</StandName>
+            //
         }
+
+        // Обработка ошибок
 
         [TestMethod]
         [ExpectedException(typeof(ConfigDir.Exceptions.ValueNotFoundException))]
@@ -276,32 +215,102 @@ namespace UnitTests
             var s2 = Cfg.Config.NotDefinedNames.Services.Service2;
 
             // ВЫВОД
-            // Ошибка. Значение не найдено
-            // Path: Config/NotDefinedNames/Services/Service2
+
+            // Ошибка
+            // ErrorType: ValueNotFoundException
+            // Message: Value not found
+            // RequestedPath: Config/Config/NotDefinedNames/Services/Service2
+            // Summaries:
+            // [Services] Коды услуг
+            // [NotDefinedNames] Значения этих параметров отсутствуют в файлах конфигурации
+            // [Config] Конфигурация
         }
 
         [TestMethod]
         [ExpectedException(typeof(ConfigDir.Exceptions.ValueTypeException))]
         public void ValueTypeError()
         {
-            var i2 = Cfg.Config.TypedValues.IntValue2;
+            var i2 = Cfg.Config.InvalidIntValue;
 
             // ВЫВОД
+
+            // Ошибка
+            // ErrorType: ValueTypeException
+            // Message: Type conversion error
+            // ErrorValue: Не число
+            // RequiredType: Int32
+            // ErrorPath: Config/Config/InvalidIntValue
+            // ErrorSource: XML файл: Config\Base-Config-10.xml
         }
     }
 
+    // Все тесты из этого класса
+    // успешно проходят если выбран
+    // файл StandA.testsettings
     [TestClass]
     public class StandA_Tests
     {
         [TestMethod]
-        public void TestMethod()
+        public void StandNameTest()
         {
-            Debug.WriteLine("Hello");
-            Debug.WriteLine(System.IO.Directory.GetCurrentDirectory());
+            Assert.AreEqual("Stand_A", Cfg.Config.StandName);
+        }
 
+        [TestMethod]
+        public void ServiceNameTest()
+        {
+            Assert.AreEqual("GOOD_CODE_A", Cfg.Names.Services.Service2);
+        }
+
+        [TestMethod]
+        public void ValidationErrorTest()
+        {
+            try
+            {
+                Assert.AreEqual("BAD_CODE_A", Cfg.Names.Services.Service1);
+            }
+            catch (Exception ex)
+            {
+                Assert.AreEqual("Ошибка валидации значения", ex.Message);
+                return;
+            }
+
+            throw new Exception("Не сработала валидация");
         }
     }
 
+    // Все тесты из этого класса
+    // успешно проходят если выбран
+    // файл StandB.testsettings
+    [TestClass]
+    public class StandB_Tests
+    {
+        [TestMethod]
+        public void StandNameTest()
+        {
+            Assert.AreEqual("Stand_B", Cfg.Config.StandName);
+        }
 
+        [TestMethod]
+        public void ServiceNameTest()
+        {
+            Assert.AreEqual("GOOD_CODE_B", Cfg.Names.Services.Service1);
+        }
 
+        [TestMethod]
+        public void ValidationErrorTest()
+        {
+            try
+            {
+                Assert.AreEqual("BAD_CODE_B", Cfg.Names.Services.Service2);
+            }
+            catch (Exception ex)
+            {
+                Assert.AreEqual("Ошибка валидации значения", ex.Message);
+                return;
+            }
+
+            throw new Exception("Не сработала валидация");
+        }
+    }
 }

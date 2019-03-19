@@ -16,7 +16,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AllConfigurations", "AllConfigurations", "{7161D8DA-D4CD-440B-AE46-CB31E87EC7A4}"
 	ProjectSection(SolutionItems) = preProject
 		AllConfigurations\Base-Config-10.xml = AllConfigurations\Base-Config-10.xml
-		AllConfigurations\Base-Names-10.xml = AllConfigurations\Base-Names-10.xml
 		AllConfigurations\Stand_A-Config-100.xml = AllConfigurations\Stand_A-Config-100.xml
 		AllConfigurations\Stand_B-Config-100.xml = AllConfigurations\Stand_B-Config-100.xml
 	EndProjectSection

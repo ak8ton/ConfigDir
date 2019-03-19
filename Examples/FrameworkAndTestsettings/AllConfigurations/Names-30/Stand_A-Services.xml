@@ -1,4 +1,4 @@
 <Services>
-  <Service2>BAD_CODE</Service2>
-  <Service3>GOOD_CODE</Service3>
+  <Service1>BAD_CODE_A</Service1>
+  <Service2>GOOD_CODE_A</Service2>
 </Services>
