@@ -1,0 +1,4 @@
+<Config>
+  <StandName>Название стенда. Stand_A или Stand_B</StandName>
+  <InvalidIntValue>Не число</InvalidIntValue>
+</Config>
