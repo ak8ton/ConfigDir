@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -13,9 +12,33 @@
     <PackageReference Include="MSTest.TestFramework" Version="2.0.0-beta2" />
   </ItemGroup>
 
+  <!-- Конфигурации -->
+  <!-- Вспомогательные группы -->
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <AllFiles>AllConfigurations</AllFiles>
+    <Base>$(AllFiles)\**\Base-*.xml</Base>
+  </PropertyGroup>
+
+  <!-- Целевые конфигурации -->
   <ItemGroup>
-    <Content Label="Stand_A" Include="AllConfigurations\**\Base-*; AllConfigurations\**\Stand_A-*" Link="Config\Stand_A\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="Always" />
-    <Content Label="Stand_B" Include="AllConfigurations\**\Base-*; AllConfigurations\**\Stand_B-*" Link="Config\Stand_B\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="Always" />
+    <StandConfig Include="$(Base);$(AllFiles)\**\Stand_A-*.xml">
+      <Name>Stand_A</Name>
+    </StandConfig>
+    <StandConfig Include="$(Base);$(AllFiles)\**\Stand_B-*.xml">
+      <Name>Stand_B</Name>
+    </StandConfig>
   </ItemGroup>
+
+  <!-- Сборка всех конфигураций -->
+  <Target Name="BuildConfigurations" BeforeTargets="Build">
+    <Message Text="Сборка конфигураций" Importance="high" />
+    <Copy SourceFiles="@(StandConfig)" DestinationFolder="$(OutputPath)\Configs\%(Name)\%(RecursiveDir)" />
+  </Target>
+
+  <Target Name="CleanConfigurations" BeforeTargets="Clean">
+    <Message Text="Очистка конфигураций" Importance="high" />
+    <RemoveDir Directories="$(OutputPath)\Configs" />
+  </Target>
   
 </Project>
