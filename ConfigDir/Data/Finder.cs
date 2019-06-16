@@ -122,7 +122,7 @@ namespace ConfigDir.Data
                     return TypeBinder.CreateDynamicInstance(key, type, this);
 
                 case TypeCategory.Array:
-                    throw new NotImplementedException($"GetValue<{type.FullName}>({key})");
+                    return FindArrayValue(key, type, valueFoundEvent);
 
                 default:
                     throw new NotImplementedException($"GetValue<{type.FullName}>({key})");
@@ -157,6 +157,20 @@ namespace ConfigDir.Data
             }
 
             return v;
+        }
+
+        private object FindArrayValue(string key, Type type, bool valueFoundEvent)
+        {
+            var value = FindFirstValue(key);
+
+            if (value.Value is IArraySource array)
+            {
+                var itemType = type.GenericTypeArguments[0];
+                var arrayType = typeof(ArrayValue<>).MakeGenericType(itemType);
+                return Activator.CreateInstance(arrayType, array);
+            }
+
+            throw new ValueTypeException("Array value expected", value, type);
         }
 
         private ValueOrSource FindFirstValue(string key)

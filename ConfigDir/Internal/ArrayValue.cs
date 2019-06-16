@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 
@@ -8,6 +9,11 @@ namespace ConfigDir.Internal
     {
         List<T> cache = new List<T>();
         IEnumerator<object> source;
+
+        public ArrayValue(IArraySource array)
+        {
+            source = array.GetArrayItamsEnumerator();
+        }
 
         private void ReadAllItems()
         {
