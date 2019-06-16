@@ -27,11 +27,6 @@ namespace ConfigDir.Data
         {
             OnConfigError?.Invoke(args);
             Parent?.ConfigError(args);
-
-            if (args.Exception != null)
-            {
-                throw args.Exception;
-            }
         }
 
         private void Validate(string key, object value)

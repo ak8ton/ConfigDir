@@ -10,21 +10,25 @@ namespace ConfigDir.Internal
     {
         const BindingFlags flags = BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
         static readonly string[] baseAsm;
-        static readonly Type arrayType;
+        static readonly Type[] arrayTypes;
 
         static TypeInspector()
         {
             baseAsm = typeof(Config).GetMembers(flags).Select(m => m.Module.Assembly.FullName).Distinct().ToArray();
-            arrayType = typeof(IEnumerable<>);
+            arrayTypes = new[] { typeof(IEnumerable<>), typeof(ICollection<>), typeof(IList<>) };
         }
 
         static public TypeCategory GetTypeCategory(Type type)
         {
             if (type.IsGenericType)
             {
-                if (type.GetGenericTypeDefinition() == arrayType)
+                var gtd = type.GetGenericTypeDefinition();
+                foreach (var arrayType in arrayTypes)
                 {
-                    return TypeCategory.Array;
+                    if (gtd == arrayType)
+                    {
+                        return TypeCategory.Array;
+                    }
                 }
             }
 

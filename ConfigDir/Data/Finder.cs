@@ -65,10 +65,26 @@ namespace ConfigDir.Data
                 }
             }
 
-            TValue value = (TValue)FindValue(key, typeof(TValue), true);
-            cache[key] = value;
+            try
+            {
+                TValue value = (TValue)FindValue(key, typeof(TValue), true);
+                cache[key] = value;
+                return value;
+            }
+            catch (ConfigException ex)
+            {
+                ex.RequestedFinder = this;
+                ex.RequestedKey = key;
 
-            return value;
+                var args = new ConfigErrorEventArgs
+                {
+                    Exception = ex
+                };
+
+                ConfigError(args);
+
+                throw ex;
+            }
         }
 
         /// <summary>
@@ -101,10 +117,12 @@ namespace ConfigDir.Data
             {
                 case TypeCategory.Value:
                     return FindPrimitiveValue(key, type, valueFoundEvent);
+
                 case TypeCategory.Config:
                     return TypeBinder.CreateDynamicInstance(key, type, this);
 
-                // todo Array
+                case TypeCategory.Array:
+                    throw new NotImplementedException($"GetValue<{type.FullName}>({key})");
 
                 default:
                     throw new NotImplementedException($"GetValue<{type.FullName}>({key})");
@@ -113,57 +131,48 @@ namespace ConfigDir.Data
 
         private object FindPrimitiveValue(string key, Type type, bool valueFoundEvent)
         {
-            try
+            var value = FindFirstValue(key);
+
+            if (value.IsSource)
             {
-                foreach (var value in FindAllValues(key))
-                {
-                    if (value.IsSource)
-                    {
-                        throw new ValueTypeException("Config option has incorrect value. Subconfig insted of value", value, type);
-                    }
-
-                    if (value.Value == null)
-                    {
-                        throw new ValueIsNullException(value);
-                    }
-
-                    var v = TryChangeType(value, type);
-
-                    if (valueFoundEvent)
-                    {
-                        Validate(key, v);
-
-                        var args = new ConfigEventArgs
-                        {
-                            Key = key,
-                            Value = v,
-                            RawValue = value.Value,
-                            Source = value.Source,
-                            Finder = this
-                        };
-
-                        ValueFound(args);
-                    }
-
-                    return v;
-                }
-              
-                throw new ValueNotFoundException();
+                throw new ValueTypeException("Config option has incorrect value. Subconfig insted of value", value, type);
             }
-            catch (ConfigException ex)
-            {
-                ex.RequestedFinder = this;
-                ex.RequestedKey = key;
 
-                var args = new ConfigErrorEventArgs
+            var v = TryChangeType(value, type);
+
+            if (valueFoundEvent)
+            {
+                Validate(key, v);
+
+                var args = new ConfigEventArgs
                 {
-                    Exception = ex
+                    Key = key,
+                    Value = v,
+                    RawValue = value.Value,
+                    Source = value.Source,
+                    Finder = this
                 };
 
-                ConfigError(args);
+                ValueFound(args);
             }
 
-            return null;
+            return v;
+        }
+
+        private ValueOrSource FindFirstValue(string key)
+        {
+            foreach (var value in FindAllValues(key))
+            {
+                if (value.Value == null)
+                {
+                    throw new ValueIsNullException(value);
+                }
+
+                return value;
+            }
+
+            throw new ValueNotFoundException();
+
         }
 
         private readonly List<ISource> deck = new List<ISource>();
