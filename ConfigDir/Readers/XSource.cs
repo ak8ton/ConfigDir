@@ -56,14 +56,7 @@ namespace ConfigDir.Readers
 
                 if (dict.ContainsKey(key))
                 {
-                    if (dict[key] is ArrayValue array)
-                    {
-                        array.Add(value);
-                    }
-                    else
-                    {
-                        dict[key] = new ArrayValue(dict[key], value);
-                    }
+                    throw new System.Exception("Key duplication error");
                 }
                 else
                 {
