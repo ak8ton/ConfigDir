@@ -113,20 +113,13 @@ namespace ConfigDir.Data
 
         private object FindValue(string key, Type type, bool valueFoundEvent)
         {
-            switch (TypeInspector.GetTypeCategory(type))
+            if (TypeInspector.IsConfig(type))
             {
-                case TypeCategory.Value:
-                    return FindPrimitiveValue(key, type, valueFoundEvent);
+                return TypeBinder.CreateDynamicInstance(key, type, this);
 
-                case TypeCategory.Config:
-                    return TypeBinder.CreateDynamicInstance(key, type, this);
-
-                case TypeCategory.Array:
-                    return FindArrayValue(key, type, valueFoundEvent);
-
-                default:
-                    throw new NotImplementedException($"GetValue<{type.FullName}>({key})");
             }
+
+            return FindPrimitiveValue(key, type, valueFoundEvent);
         }
 
         private object FindPrimitiveValue(string key, Type type, bool valueFoundEvent)
@@ -157,20 +150,6 @@ namespace ConfigDir.Data
             }
 
             return v;
-        }
-
-        private object FindArrayValue(string key, Type type, bool valueFoundEvent)
-        {
-            var value = FindFirstValue(key);
-
-            if (value.Value is IArraySource array)
-            {
-                var itemType = type.GenericTypeArguments[0];
-                var arrayType = typeof(ArrayValue<>).MakeGenericType(itemType);
-                return Activator.CreateInstance(arrayType, array);
-            }
-
-            throw new ValueTypeException("Array value expected", value, type);
         }
 
         private ValueOrSource FindFirstValue(string key)

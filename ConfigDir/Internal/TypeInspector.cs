@@ -18,7 +18,12 @@ namespace ConfigDir.Internal
             arrayTypes = new[] { typeof(IEnumerable<>), typeof(ICollection<>), typeof(IList<>) };
         }
 
-        static public TypeCategory GetTypeCategory(Type type)
+        static public bool IsConfig(Type type)
+        {
+            return (type.IsInterface || type.IsAbstract);
+        }
+
+        static public bool IsArray(Type type)
         {
             if (type.IsGenericType)
             {
@@ -27,17 +32,12 @@ namespace ConfigDir.Internal
                 {
                     if (gtd == arrayType)
                     {
-                        return TypeCategory.Array;
+                        return true;
                     }
                 }
             }
 
-            if (type.IsInterface || type.IsAbstract)
-            {
-                return TypeCategory.Config;
-            }
-
-            return TypeCategory.Value;
+            return false;
         }
 
         static public IEnumerable<PropertyInfo> GetNotImplementedProperties(Type type)
