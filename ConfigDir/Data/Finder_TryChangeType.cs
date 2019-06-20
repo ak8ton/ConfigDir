@@ -27,12 +27,19 @@ namespace ConfigDir.Data
                 return value;
             }
 
+            Exception convertException = null;
+
             if (value is IConvertible)
             {
-                return Convert.ChangeType(value, type);
+                try
+                {
+                    return Convert.ChangeType(value, type);
+                }
+                catch (Exception ex)
+                {
+                    convertException = ex;
+                }
             }
-
-            // todo Array
 
             // class
             if (type.IsClass)
@@ -53,7 +60,7 @@ namespace ConfigDir.Data
                 }
             }
 
-            throw new Exception($"Type {type.FullName} not supported");
+            throw new Exception($"Type {type.FullName} not supported", convertException);
         }
 
         private object CreatePropsObject(Type type)
