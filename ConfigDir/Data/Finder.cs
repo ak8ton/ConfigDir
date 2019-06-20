@@ -202,6 +202,7 @@ namespace ConfigDir.Data
             return this;
         }
 
+        // TODO: make it public
         internal IEnumerable<ValueOrSource> FindAllValues(string key)
         {
             foreach (var source in deck)
