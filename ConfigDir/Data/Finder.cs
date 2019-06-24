@@ -24,11 +24,6 @@ namespace ConfigDir.Data
             ConfigType = configType;
             Key = key;
             Keys = keys;
-
-            if (parent != null)
-            {
-                deck.Add(new ParentSource(this));
-            }
         }
 
         #endregion Instance

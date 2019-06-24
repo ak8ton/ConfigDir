@@ -60,6 +60,12 @@ namespace ConfigDir.Internal
             var c = TypeDictionary[type];
             var instance = Activator.CreateInstance(c.Item1);
             var finder = new Finder(type, key, c.Item2, parent);
+
+            if (parent != null)
+            {
+                finder.Extend(new ParentSource(finder));
+            }
+            
             ((Config)instance).SetFinder(finder);
             return instance;
         }
