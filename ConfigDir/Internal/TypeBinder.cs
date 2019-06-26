@@ -22,7 +22,7 @@ namespace ConfigDir.Internal
 
         static int counter;
         static readonly string unicName;
-        static readonly Dictionary<Type, Tuple<Type, string[]>> TypeDictionary;
+        static readonly Dictionary<Type, Type> typeDictionary;
 
         static TypeBinder()
         {
@@ -42,24 +42,20 @@ namespace ConfigDir.Internal
 
             counter = 0;
             unicName = string.Join("", Guid.NewGuid().ToByteArray().Select(c => c.ToString("X")));
-            TypeDictionary = new Dictionary<Type, Tuple<Type, string[]>>();
+            typeDictionary = new Dictionary<Type, Type>();
         }
 
         public static object CreateDynamicInstance(string key, Type type, Finder parent)
         {
-            if (!TypeDictionary.ContainsKey(type))
+            if (!typeDictionary.ContainsKey(type))
             {
                 var properties = TypeInspector.GetNotImplementedProperties(type);
-                TypeDictionary[type] = new Tuple<Type, string[]>
-                (
-                    GetDynamicType(type, properties),
-                    properties.Select(p => p.Name).ToArray()
-                );
+                typeDictionary[type] = GetDynamicType(type, properties);
             }
 
-            var c = TypeDictionary[type];
-            var instance = Activator.CreateInstance(c.Item1);
-            var finder = new Finder(type, key, c.Item2, parent);
+            var t = typeDictionary[type];
+            var instance = Activator.CreateInstance(t);
+            var finder = new Finder(type, key, parent);
 
             if (parent != null)
             {

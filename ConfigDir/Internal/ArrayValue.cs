@@ -10,11 +10,6 @@ namespace ConfigDir.Internal
         List<T> cache = new List<T>();
         IEnumerator<object> source;
 
-        public ArrayValue(IArraySource array)
-        {
-            source = array.GetArrayItamsEnumerator();
-        }
-
         private void ReadAllItems()
         {
             if (source == null) return;

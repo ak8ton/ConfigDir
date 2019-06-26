@@ -11,29 +11,30 @@ namespace ConfigDir.Data
     /// </summary>
     public partial class Finder
     {
-        #region Instance
+        private readonly List<ISource> deck = new List<ISource>();
+        private readonly Dictionary<string, object> cache = new Dictionary<string, object>();
 
         /// <summary>
         /// Config type
         /// </summary>
         public Type ConfigType { get; }
 
-        internal Finder(Type configType, string key, IEnumerable<string> keys, Finder parent)
+        /// <summary>
+        /// Farent Finder
+        /// </summary>
+        public Finder Parent { get; }
+
+        /// <summary>
+        /// Key of Finder in parent Finder
+        /// </summary>
+        public string Key { get; }
+
+        internal Finder(Type configType, string key, Finder parent)
         {
             Parent = parent;
             ConfigType = configType;
             Key = key;
-            Keys = keys;
         }
-
-        #endregion Instance
-
-        private readonly Dictionary<string, object> cache = new Dictionary<string, object>();
-
-        /// <summary>
-        /// List of existing keys
-        /// </summary>
-        public IEnumerable<string> Keys { get; }
 
         /// <summary>
         /// Get value by key and type
@@ -106,12 +107,38 @@ namespace ConfigDir.Data
             cache[key] = value;
         }
 
+        /// <summary>
+        /// Add new and override existing values
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public Finder Update(ISource source)
+        {
+            deck.Insert(0, source);
+            return this;
+        }
+
+        /// <summary>
+        /// Add new values only
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public Finder Extend(ISource source)
+        {
+            deck.Add(source);
+            return this;
+        }
+
         private object FindValue(string key, Type type, bool valueFoundEvent)
         {
             if (TypeInspector.IsConfig(type))
             {
                 return TypeBinder.CreateDynamicInstance(key, type, this);
+            }
 
+            if (TypeInspector.IsArray(type))
+            {
+                throw new NotImplementedException("Array value");
             }
 
             return FindPrimitiveValue(key, type, valueFoundEvent);
@@ -161,40 +188,6 @@ namespace ConfigDir.Data
 
             throw new ValueNotFoundException();
 
-        }
-
-        private readonly List<ISource> deck = new List<ISource>();
-
-        /// <summary>
-        /// Farent Finder
-        /// </summary>
-        public Finder Parent { get; }
-
-        /// <summary>
-        /// Key of Finder in parent Finder
-        /// </summary>
-        public string Key { get; }
-
-        /// <summary>
-        /// Add new and override existing values
-        /// </summary>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public Finder Update(ISource source)
-        {
-            deck.Insert(0, source);
-            return this;
-        }
-
-        /// <summary>
-        /// Add new values only
-        /// </summary>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public Finder Extend(ISource source)
-        {
-            deck.Add(source);
-            return this;
         }
 
         // TODO: make it public
