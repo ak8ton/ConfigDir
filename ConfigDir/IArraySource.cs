@@ -1,24 +1,28 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace ConfigDir
 {
     /// <summary>
     /// Configuration source base interface
     /// </summary>
-    public interface ISource
+    public interface IArraySource
     {
         /// <summary>
-        /// Get all values by key
+        /// Get all values by index
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="index"></param>
         /// <returns></returns>
-        IEnumerable<object> GetAllValues(string key);
+        IEnumerable<object> GetAllValues(int index);
 
         /// <summary>
-        /// All keys
+        /// Count
         /// </summary>
         /// <returns></returns>
-        IEnumerable<string> GetKeys();
+        int GetCount();
 
         /// <summary>
         /// String representation

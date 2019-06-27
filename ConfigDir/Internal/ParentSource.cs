@@ -42,5 +42,10 @@ namespace ConfigDir.Internal
                 }
             }
         }
+
+        public IEnumerable<string> GetKeys()
+        {
+            throw new System.NotImplementedException("ConfigDir.Internal.ParentSource.GetKeys()");
+        }
     }
 }

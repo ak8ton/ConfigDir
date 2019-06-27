@@ -99,5 +99,10 @@ namespace ConfigDir.Readers
 
             throw new Exception("Path not exists: " + path);
         }
+
+        public IEnumerable<string> GetKeys()
+        {
+            return SourcesByKey.Keys;
+        }
     }
 }

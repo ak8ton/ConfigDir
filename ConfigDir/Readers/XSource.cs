@@ -4,11 +4,23 @@ using System.Xml.Linq;
 
 namespace ConfigDir.Readers
 {
-    class XSource : ISource
+    class XSource : ISource, IArraySource
     {
+        class ValuesCollection
+        {
+            public Dictionary<string, object> Dict { get; }
+            public List<object> Values { get; }
+
+            public ValuesCollection(Dictionary<string, object> dict, List<object> values)
+            {
+                Dict = dict;
+                Values = values;
+            }
+        }
+
         private XElement element;
-        private Dictionary<string, object> _d = null;
-        private Dictionary<string, object> Dict => _d ?? (_d = Parse());
+        private ValuesCollection _v = null;
+        private ValuesCollection Values => _v ?? (_v = Parse());
 
         public string BasePath { get; }
         public string FilePath { get; }
@@ -31,10 +43,30 @@ namespace ConfigDir.Readers
         public IEnumerable<object> GetAllValues(string key)
         {
             key = key.ToLower();
-            if (Dict.ContainsKey(key))
+            if (Values.Dict.ContainsKey(key))
             {
-                yield return Dict[key];
+                yield return Values.Dict[key];
             }
+        }
+
+        public IEnumerable<object> GetAllValues(int index)
+        {
+            if (index < 0) yield break;
+
+            if (Values.Values.Count > index)
+            {
+                yield return Values.Values[index];
+            }
+        }
+
+        public IEnumerable<string> GetKeys()
+        {
+            return Values.Dict.Keys;
+        }
+
+        public int GetCount()
+        {
+            return Values.Values.Count;
         }
 
         public override string ToString()
@@ -42,23 +74,22 @@ namespace ConfigDir.Readers
             return Description;
         }
 
-        private Dictionary<string, object> Parse()
+        private ValuesCollection Parse()
         {
+            var values = new List<object>();
             var dict = new Dictionary<string, object>();
             var nodes = new List<XElement>();
 
             //TODO Обработка ошибок IO
             foreach (var el in (element ?? XDocument.Load(System.IO.Path.Combine(BasePath, FilePath)).Root).Elements())
             {
-                string key = el.Name.LocalName.ToLower();
-                object value = GetValue(el);
                 nodes.Add(el);
 
-                if (dict.ContainsKey(key))
-                {
-                    throw new System.Exception("Key duplication error");
-                }
-                else
+                string key = el.Name.LocalName.ToLower();
+                object value = GetValue(el);
+
+                values.Add(value);
+                if (!dict.ContainsKey(key))
                 {
                     dict[key] = value;
                 }
@@ -67,7 +98,7 @@ namespace ConfigDir.Readers
             element = null;
             nodes.Remove();
 
-            return dict;
+            return new ValuesCollection(dict, values);
         }
 
         private object GetValue(XElement element)
