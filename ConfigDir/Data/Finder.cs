@@ -27,9 +27,9 @@ namespace ConfigDir.Data
         /// <summary>
         /// Key of Finder in parent Finder
         /// </summary>
-        public string Key { get; }
+        public KeyOrIndex Key { get; }
 
-        internal Finder(Type configType, string key, Finder parent)
+        internal Finder(Type configType, KeyOrIndex key, Finder parent)
         {
             Parent = parent;
             ConfigType = configType;
@@ -49,38 +49,23 @@ namespace ConfigDir.Data
                 throw new ArgumentException(nameof(key));
             }
 
-            if (cache.ContainsKey(key))
+            return GetValue<TValue>(new KeyOrIndex(key));
+        }
+
+        /// <summary>
+        /// Get value by key and type
+        /// </summary>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public TValue GetValue<TValue>(int index)
+        {
+            if (index < 0)
             {
-                if (cache[key] is TValue v)
-                {
-                    return v;
-                }
-                else
-                {
-                    throw new Exception();
-                }
+                throw new ArgumentException(nameof(index));
             }
 
-            try
-            {
-                TValue value = (TValue)FindValue(key, typeof(TValue), true);
-                cache[key] = value;
-                return value;
-            }
-            catch (ConfigException ex)
-            {
-                ex.RequestedFinder = this;
-                ex.RequestedKey = key;
-
-                var args = new ConfigErrorEventArgs
-                {
-                    Exception = ex
-                };
-
-                ConfigError(args);
-
-                throw ex;
-            }
+            return GetValue<TValue>(new KeyOrIndex(index));
         }
 
         /// <summary>
@@ -108,11 +93,27 @@ namespace ConfigDir.Data
         }
 
         /// <summary>
+        /// Set value by index
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="value"></param>
+        public void SetValue(int index, object value)
+        {
+            if (index < 0)
+            {
+                throw new IndexOutOfRangeException(nameof(index));
+            }
+
+            string key = index.ToString();
+            SetValue(key, value);
+        }
+
+        /// <summary>
         /// Add new and override existing values
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public Finder Update(ISource source)
+        public Finder Update(IConfigSource source)
         {
             deck.Insert(0, source);
             return this;
@@ -123,30 +124,67 @@ namespace ConfigDir.Data
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public Finder Extend(ISource source)
+        public Finder Extend(IConfigSource source)
         {
             deck.Add(source);
             return this;
         }
 
-        private object FindValue(string key, Type type, bool valueFoundEvent)
+        private TValue GetValue<TValue>(KeyOrIndex keyOrIndex)
+        {
+            var key = keyOrIndex.ToString();
+            if (cache.ContainsKey(key))
+            {
+                if (cache[key] is TValue v)
+                {
+                    return v;
+                }
+                else
+                {
+                    throw new Exception();
+                }
+            }
+
+            try
+            {
+                TValue value = (TValue)FindValue(keyOrIndex, typeof(TValue), true);
+                cache[key] = value;
+                return value;
+            }
+            catch (ConfigException ex)
+            {
+                ex.RequestedFinder = this;
+                ex.RequestedKey = key;
+
+                var args = new ConfigErrorEventArgs
+                {
+                    Exception = ex
+                };
+
+                ConfigError(args);
+
+                throw ex;
+            }
+        }
+
+        private object FindValue(KeyOrIndex keyOrIndex, Type type, bool valueFoundEvent)
         {
             if (TypeInspector.IsConfig(type))
             {
-                return TypeBinder.CreateDynamicInstance(key, type, this);
+                if (TypeInspector.IsArray(type))
+                {
+                    throw new NotImplementedException("Массивы не реализованы");
+                }
+
+                return TypeBinder.CreateDynamicInstance(keyOrIndex, type, this);
             }
 
-            if (TypeInspector.IsArray(type))
-            {
-                throw new NotImplementedException("Array value");
-            }
-
-            return FindPrimitiveValue(key, type, valueFoundEvent);
+            return FindPrimitiveValue(keyOrIndex, type, valueFoundEvent);
         }
 
-        private object FindPrimitiveValue(string key, Type type, bool valueFoundEvent)
+        private object FindPrimitiveValue(KeyOrIndex keyOrIndex, Type type, bool valueFoundEvent)
         {
-            var value = FindFirstValue(key);
+            var value = FindFirstValue(keyOrIndex);
 
             if (value.IsSource)
             {
@@ -157,6 +195,7 @@ namespace ConfigDir.Data
 
             if (valueFoundEvent)
             {
+                var key = keyOrIndex.ToString();
                 Validate(key, v);
 
                 var args = new ConfigEventArgs
@@ -174,9 +213,9 @@ namespace ConfigDir.Data
             return v;
         }
 
-        private ValueOrSource FindFirstValue(string key)
+        private ValueOrSource FindFirstValue(KeyOrIndex keyOrIndex)
         {
-            foreach (var value in FindAllValues(key))
+            foreach (var value in FindAllValues(keyOrIndex))
             {
                 if (value.Value == null)
                 {
@@ -191,11 +230,42 @@ namespace ConfigDir.Data
         }
 
         // TODO: make it public
-        internal IEnumerable<ValueOrSource> FindAllValues(string key)
+        internal IEnumerable<ValueOrSource> FindAllValues(KeyOrIndex keyOrIndex)
         {
             foreach (var source in deck)
             {
-                foreach (var value in source.GetAllValues(key))
+                IEnumerable<object> enumerator = null;
+
+                if (keyOrIndex.Key != null)
+                {
+                    if (source is IConfigSource cfg)
+                    {
+                        enumerator = cfg.GetAllValues(keyOrIndex.Key);
+                    }
+                    else
+                    {
+                        throw new Exception("Congig expected");
+                    }
+                }
+
+                if (keyOrIndex.Index != null)
+                {
+                    if (source is IArraySource cfg)
+                    {
+                        enumerator = cfg.GetAllValues(keyOrIndex.Index.Value);
+                    }
+                    else
+                    {
+                        throw new Exception("Array expected");
+                    }
+                }
+
+                if (enumerator == null)
+                {
+                    throw new Exception("Unexpected key type");
+                }
+
+                foreach (var value in enumerator)
                 {
                     if (value is ValueOrSource vos)
                     {
@@ -203,11 +273,11 @@ namespace ConfigDir.Data
                     }
                     else if (value is ISource src)
                     {
-                        yield return ValueOrSource.MkSource(this, src, key);
+                        yield return ValueOrSource.MkSource(this, src, keyOrIndex);
                     }
                     else
                     {
-                        yield return ValueOrSource.MkValue(this, source, value, key);
+                        yield return ValueOrSource.MkValue(this, source, value, keyOrIndex);
                     }
                 }
             }

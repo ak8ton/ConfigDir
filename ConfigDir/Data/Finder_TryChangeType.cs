@@ -71,7 +71,7 @@ namespace ConfigDir.Data
             {
                 if (property.CanWrite)
                 {
-                    property.SetValue(obj, FindValue(property.Name, property.PropertyType, false));
+                    property.SetValue(obj, FindValue(new KeyOrIndex(property.Name), property.PropertyType, false));
                 }
             }
 

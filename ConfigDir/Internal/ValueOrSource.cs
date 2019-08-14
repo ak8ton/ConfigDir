@@ -9,27 +9,27 @@ namespace ConfigDir.Internal
         public object Value { get; }
 
         public Finder Finder { get; }
-        public string Key { get; }
+        public KeyOrIndex KeyOrIndex { get; }
         // public string Path => finder.GetPath(key);
 
-        private ValueOrSource(Finder finder, bool isSource, ISource source, object value, string key)
+        private ValueOrSource(Finder finder, bool isSource, ISource source, object value, KeyOrIndex keyOrIndex)
         {
             Finder = finder;
-            Key = key;
+            KeyOrIndex = keyOrIndex;
 
             IsSource = isSource;
             Source = source;
             Value = value;
         }
 
-        static public ValueOrSource MkValue(Finder finder, ISource source, object value, string key)
+        static public ValueOrSource MkValue(Finder finder, ISource source, object value, KeyOrIndex keyOrIndex)
         {
-            return new ValueOrSource(finder, false, source, value, key);
+            return new ValueOrSource(finder, false, source, value, keyOrIndex);
         }
 
-        static public ValueOrSource MkSource(Finder finder, ISource source, string key)
+        static public ValueOrSource MkSource(Finder finder, ISource source, KeyOrIndex keyOrIndex)
         {
-            return new ValueOrSource(finder, true, source, null, key);
+            return new ValueOrSource(finder, true, source, null, keyOrIndex);
         }
     }
 }

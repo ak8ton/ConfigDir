@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Linq;
 
 
 namespace ConfigDir.Readers
 {
-    class XSource : ISource, IArraySource
+    class XSource : IConfigSource, IArraySource
     {
         class ValuesCollection
         {
@@ -18,6 +19,7 @@ namespace ConfigDir.Readers
             }
         }
 
+        private bool stopIteration = false;
         private XElement element;
         private ValuesCollection _v = null;
         private ValuesCollection Values => _v ?? (_v = Parse());
@@ -51,11 +53,17 @@ namespace ConfigDir.Readers
 
         public IEnumerable<object> GetAllValues(int index)
         {
-            if (index < 0) yield break;
-
-            if (Values.Values.Count > index)
+            if (index >= 0)
             {
-                yield return Values.Values[index];
+                if (Values.Values.Count > index)
+                {
+                    yield return Values.Values[index];
+                }
+            }
+
+            if (stopIteration)
+            {
+                throw new StopSourcesIteraionException();
             }
         }
 
@@ -81,7 +89,9 @@ namespace ConfigDir.Readers
             var nodes = new List<XElement>();
 
             //TODO Обработка ошибок IO
-            foreach (var el in (element ?? XDocument.Load(System.IO.Path.Combine(BasePath, FilePath)).Root).Elements())
+            element = element ?? XDocument.Load(System.IO.Path.Combine(BasePath, FilePath)).Root;
+
+            foreach (var el in element.Elements())
             {
                 nodes.Add(el);
 
@@ -95,6 +105,8 @@ namespace ConfigDir.Readers
                 }
             }
 
+            stopIteration = element.Attributes().Any(a => a.Name.LocalName.ToLower() == "override");
+
             element = null;
             nodes.Remove();
 
@@ -103,8 +115,7 @@ namespace ConfigDir.Readers
 
         private object GetValue(XElement element)
         {
-            // TODO Что делать с аттрибутами?
-            if (element.HasElements || element.HasAttributes)
+            if (element.HasElements)
             {
                 return new XSource(BasePath, FilePath, element);
             }

@@ -33,19 +33,20 @@ namespace ConfigDir.Internal
             BaseConfigType = typeof(Config);
 
             var data = typeof(Finder);
-            Getter = data.GetMethod(getterName);
-            Setter = data.GetMethod(setterName);
-            DataGetter = BaseConfigType.GetProperty(dataGetterName).GetGetMethod();
 
-            GetterArgs = Getter.GetParameters().Select(p => p.ParameterType).ToArray();
-            SetterArgs = Setter.GetParameters().Select(p => p.ParameterType).ToArray();
+            GetterArgs = new[] { typeof(string) };
+            SetterArgs = new[] { typeof(string), typeof(object) };
+
+            Getter = data.GetMethod(getterName, GetterArgs);
+            Setter = data.GetMethod(setterName, SetterArgs);
+            DataGetter = BaseConfigType.GetProperty(dataGetterName).GetGetMethod();
 
             counter = 0;
             unicName = string.Join("", Guid.NewGuid().ToByteArray().Select(c => c.ToString("X")));
             typeDictionary = new Dictionary<Type, Type>();
         }
 
-        public static object CreateDynamicInstance(string key, Type type, Finder parent)
+        public static object CreateDynamicInstance(KeyOrIndex keyOrIndex, Type type, Finder parent)
         {
             if (!typeDictionary.ContainsKey(type))
             {
@@ -55,7 +56,7 @@ namespace ConfigDir.Internal
 
             var t = typeDictionary[type];
             var instance = Activator.CreateInstance(t);
-            var finder = new Finder(type, key, parent);
+            var finder = new Finder(type, keyOrIndex, parent);
 
             if (parent != null)
             {

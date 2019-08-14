@@ -29,7 +29,7 @@ namespace ConfigDir
 
             do
             {
-                var key = config.Key;
+                var key = config.Key.ToString();
                 if (key != null) path.Add(key);
                 config = config?.Parent;
 
@@ -86,7 +86,7 @@ namespace ConfigDir
                     yield return $"[{key}] {summary}";
                 }
 
-                key = finder.Key;
+                key = finder.Key.ToString();
                 finder = finder.Parent;
             }
         }

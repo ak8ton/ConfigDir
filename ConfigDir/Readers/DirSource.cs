@@ -7,14 +7,14 @@ using System.Text.RegularExpressions;
 
 namespace ConfigDir.Readers
 {
-    class DirSource : ISource
+    class DirSource : IConfigSource
     {
         public string Description { get; }
         public string BasePath { get; }
         public string DirName { get; }
 
-        private Dictionary<string, List<ISource>> s = null;
-        private Dictionary<string, List<ISource>> SourcesByKey => s ?? (s = ReadDir());
+        private Dictionary<string, List<IConfigSource>> s = null;
+        private Dictionary<string, List<IConfigSource>> SourcesByKey => s ?? (s = ReadDir());
         private readonly Regex pattern = new Regex(@"^(.*-)?(?<KEY>@?_?\p{L}\w{0,20})(?<PRIOR>-\d{1,4})?$", RegexOptions.IgnoreCase);
 
         private string dirPath;
@@ -44,9 +44,9 @@ namespace ConfigDir.Readers
             return Description;
         }
 
-        private Dictionary<string, List<ISource>> ReadDir()
+        private Dictionary<string, List<IConfigSource>> ReadDir()
         {
-            var dict = new Dictionary<string, List<ISource>>();
+            var dict = new Dictionary<string, List<IConfigSource>>();
 
             var groups = Directory.EnumerateFileSystemEntries(dirPath)
                 .Select(f => GetKeyPrior(f))
@@ -85,7 +85,7 @@ namespace ConfigDir.Readers
             throw new Exception("Bad filename " + name);
         }
 
-        private ISource GetSource(string path)
+        private IConfigSource GetSource(string path)
         {
             if (Directory.Exists(path))
             {

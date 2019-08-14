@@ -1,25 +1,10 @@
-﻿using System.Collections.Generic;
-
-namespace ConfigDir
+﻿namespace ConfigDir
 {
     /// <summary>
-    /// Configuration source base interface
+    /// Базовый интерфейс для источников
     /// </summary>
     public interface ISource
     {
-        /// <summary>
-        /// Get all values by key
-        /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        IEnumerable<object> GetAllValues(string key);
-
-        /// <summary>
-        /// All keys
-        /// </summary>
-        /// <returns></returns>
-        IEnumerable<string> GetKeys();
-
         /// <summary>
         /// String representation
         /// </summary>

@@ -5,19 +5,19 @@ namespace ConfigDir
     /// <summary>
     /// Configuration source base interface
     /// </summary>
-    public interface IArraySource : ISource
+    public interface IConfigSource : ISource
     {
         /// <summary>
-        /// Get all values by index
+        /// Get all values by key
         /// </summary>
-        /// <param name="index"></param>
+        /// <param name="key"></param>
         /// <returns></returns>
-        IEnumerable<object> GetAllValues(int index);
+        IEnumerable<object> GetAllValues(string key);
 
         /// <summary>
-        /// Count
+        /// All keys
         /// </summary>
         /// <returns></returns>
-        int GetCount();
+        IEnumerable<string> GetKeys();
     }
 }

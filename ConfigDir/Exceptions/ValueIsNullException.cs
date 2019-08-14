@@ -14,7 +14,7 @@ namespace ConfigDir.Exceptions
         /// <summary>
         /// Path where error occurred
         /// </summary>
-        public string ErrorPath => ep ?? (ep = ErrorFinder.GetPath(ErrorKey));
+        public string ErrorPath => ep ?? (ep = ErrorFinder.GetPath(ErrorKey.ToString()));
         string ep = null;
 
         /// <summary>
@@ -23,7 +23,7 @@ namespace ConfigDir.Exceptions
         public ISource ErrorSource { get; internal set; }
 
         internal Finder ErrorFinder { get; set; }
-        internal string ErrorKey { get; set; }
+        internal KeyOrIndex ErrorKey { get; set; }
 
         internal ValueIsNullException(ValueOrSource value) :
             this("Value is null", value, null) { }
@@ -31,7 +31,7 @@ namespace ConfigDir.Exceptions
         internal ValueIsNullException(string messae, ValueOrSource value, Exception inner) : 
             base(messae, inner)
         {
-            ErrorKey = value.Key;
+            ErrorKey = value.KeyOrIndex;
             ErrorFinder = value.Finder;
             ErrorSource = value.Source;
         }
